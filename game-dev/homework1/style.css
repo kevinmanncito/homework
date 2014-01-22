@@ -1,0 +1,22 @@
+#container {
+  padding: 5px;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+h1, h2 {
+  text-align: center;
+  border-bottom: 1px solid whitesmoke;
+}
+
+.col-1-2 {
+  float: left;
+  width: 50%;
+}
+
+.col-content {
+  border-left: 1px solid whitesmoke;
+  border-right: 1px solid whitesmoke;
+  padding: 5px;
+  min-height: 300px;
+}
