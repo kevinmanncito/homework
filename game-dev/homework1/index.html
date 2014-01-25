@@ -5,19 +5,23 @@
   <title>Kevin's Game Loop</title>
   <link rel="stylesheet" href="normalize.css">
   <link rel="stylesheet" href="style.css">
-  <script type="text/javascript" src="scripts.js"></script>
+  <!-- <script type="text/javascript" src="scripts.js"></script> -->
 </head>
 <body>
   <div id="container">
     <h1>Kevin's Game Loop</h1>
     <div class="col-1-2">
-      <div class="col-content">
-        <h2>Output</h2>
+      <div class="left-col">
+        <h2 class='heading'>Output</h2>
       </div>
     </div>
     <div class="col-1-2">
-      <div class="col-content">
-        <h2>Input</h2>
+      <div class="right-col">
+        <h2 class="heading">Input</h2>
+        <label for="name" class="hide">Name</label>
+        <input type="text" id="name" placeholder="Name">
+        <label for="interval" class="hide">Interval</label>
+        <input type="text" id="interval" placeholder="Interval">
       </div>
     </div>
   </div>
