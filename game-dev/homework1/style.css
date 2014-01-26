@@ -4,13 +4,20 @@
   margin: 0 auto;
 }
 
-h1, h2 {
-  text-align: center;
+header {
+  background-color: whitesmoke;
 }
 
-.heading {
-  border-bottom: 1px solid whitesmoke;
+h1, h5 {
+  text-align: center;
+  margin: 0;
+  padding: 10px;
 }
+
+h5 {
+  margin: 10px 0;
+}
+
 
 .col-1-2 {
   float: left;
@@ -19,15 +26,20 @@ h1, h2 {
 
 .right-col {
   border-left: 1px solid whitesmoke;
-  border-right: 1px solid whitesmoke;
-  padding: 5px;
+  padding: 7px;
   min-height: 300px;
 }
 
 .left-col {
-  border-left: 1px solid whitesmoke;
   padding: 5px;
   min-height: 300px;
+  max-height: 500px;
+  overflow: hidden;
+}
+
+.content {
+  border: 1px solid whitesmoke;
+  float: left;
 }
 
 .hide {
@@ -36,7 +48,25 @@ h1, h2 {
 
 input {
   width: 100%;
-  padding: 2px 0;
-  margin: 4px 0;
+  padding: 3px 0 3px 2px;
+  margin: 4px -3px 4px -3px;
   border-radius: 4px;
+}
+
+button {
+  width: 100%;
+  padding: 5px;
+  margin: 2px 0;
+}
+
+.error {
+  margin: 5px;
+  text-align: center;
+  color: red;
+}
+
+footer {
+  float: left;
+  width: 100%;
+  background-color: whitesmoke;
 }
