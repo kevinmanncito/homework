@@ -106,18 +106,18 @@ MYGAME.graphics = (function() {
 
   function Maze() {
     var mergeGroup = function(group1, group2, maze, size) {
+      console.log(group1);
+      console.log(group2);
       for (var row = 0; row < size; row++) {
         for (var col = 0; col < size; col++) {
-          if (maze[row][col].groupId == group2)
-            console.log(maze[row][col]);
-            console.log('set the groupId equal to the other group id');
-            maze[row][col].groupId == group1;
-            console.log(maze[row][col]);
+          if (maze[row][col].groupId == group2) {
+            maze[row][col].groupId = group1;
+          }
         }
       }
       return maze;
     };
-    var size = 5;
+    var size = 3;
     var maze = [];
     var directions = ['up', 'right', 'down', 'left'];
     // directions[0] = up
@@ -142,26 +142,17 @@ MYGAME.graphics = (function() {
       }
     };
 
-    for (var row = 0; row < size; row++) {
-      for (var col = 0; col < size; col++) {
-        console.log(maze[row][col]);
-      }
-    }
-
     // Use kruskels algorithm to create the maze
     // Each time we loop through there will be one less groupId
     // the maze is done drawing when there is only one group id
 
-    // for (var count = size*size; count > 1; count--) {
+    for (var count=0; count < 3; count++) {
     
       // Get two random indices for the row and column
       // and try and get a merge to happen
       var row = Math.floor(Math.random() * size);
       var col = Math.floor(Math.random() * size);
 
-      console.log(row);
-      console.log(col);
-      console.log(maze[row][col]);
       // If not merged lets do a merge to a random adjacent cell
       // Choose a random direction to merge
       var i = Math.floor(Math.random() * 4);
@@ -230,7 +221,7 @@ MYGAME.graphics = (function() {
           if (col==0) {
             i=1
           } else {
-            if (maze[row][col].groupId != maze[row+1][col].groupId) {
+            if (maze[row][col].groupId != maze[row][col+1].groupId) {
               // Weve got a merge cus the groupId's are different!
               maze = mergeGroup(maze[row][col].groupId,
                                 maze[row][col+1].groupId,
@@ -245,9 +236,7 @@ MYGAME.graphics = (function() {
           console.log('no available merge attempts for this guy... lets get a new vertex to try merging');
         }
       }
-
-
-    // }
+    }
 
     for (var row = 0; row < size; row++) {
       for (var col = 0; col < size; col++) {
