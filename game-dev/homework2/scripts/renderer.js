@@ -9,8 +9,8 @@
 MYGAME.graphics = (function() {
   'use strict';
   
-  var canvas = document.getElementById('canvas-main');
-  var context = canvas.getContext('2d');
+  // var canvas = document.getElementById('canvas-main');
+  // var context = canvas.getContext('2d');
 
   //------------------------------------------------------------------
   //
@@ -30,9 +30,9 @@ MYGAME.graphics = (function() {
   // Public function that allows the client code to clear the canvas.
   //
   //------------------------------------------------------------------
-  function clear() {
-    context.clear();
-  }
+  // function clear() {
+  //   context.clear();
+  // }
   
   //------------------------------------------------------------------
   //
@@ -104,10 +104,8 @@ MYGAME.graphics = (function() {
     return that;
   }
 
-  function Maze() {
+  function Maze(size) {
     var mergeGroup = function(group1, group2, maze, size) {
-      console.log(group1);
-      console.log(group2);
       for (var row = 0; row < size; row++) {
         for (var col = 0; col < size; col++) {
           if (maze[row][col].groupId == group2) {
@@ -117,7 +115,6 @@ MYGAME.graphics = (function() {
       }
       return maze;
     };
-    var size = 3;
     var maze = [];
     var directions = ['up', 'right', 'down', 'left'];
     // directions[0] = up
@@ -136,7 +133,8 @@ MYGAME.graphics = (function() {
         maze[row].push({
           top:     false,
           right:   false,
-          groupId: id
+          groupId: id,
+          cellId:  id*10
         });
         id++;
       }
@@ -146,21 +144,24 @@ MYGAME.graphics = (function() {
     // Each time we loop through there will be one less groupId
     // the maze is done drawing when there is only one group id
 
-    for (var count=0; count < 3; count++) {
+    for (var count=0; count < size*size + 1; count++) {
+      console.log('merge #: ' + String(count+1));
     
       // Get two random indices for the row and column
       // and try and get a merge to happen
       var row = Math.floor(Math.random() * size);
       var col = Math.floor(Math.random() * size);
 
+
       // If not merged lets do a merge to a random adjacent cell
       // Choose a random direction to merge
       var i = Math.floor(Math.random() * 4);
       var merged = false;
       var availableMergeAttempts = 4;
-      while(!merged) {
+      var availableMergeSpots = size*size+1;
+      var done = false;
+      while(!merged && !done) {
         if (directions[i] == 'up') {
-          console.log('tried to merge up');
           availableMergeAttempts--;
 
           // Check to make sure were not merging out of the upper wall
@@ -173,7 +174,7 @@ MYGAME.graphics = (function() {
                                 maze[row-1][col].groupId,
                                 maze,
                                 size);
-              console.log('merged up');
+              maze[row][col].top = true;
               merged = true;
             } else {
               i++;
@@ -181,7 +182,6 @@ MYGAME.graphics = (function() {
           }
         }
         if (directions[i] == 'right') {
-          console.log('tried to merge right');
           availableMergeAttempts--;
           // Check to make sure were not merging out of the right wall
           if (col==size-1) {
@@ -193,13 +193,12 @@ MYGAME.graphics = (function() {
                                 maze[row][col+1].groupId,
                                 maze,
                                 size);
-              console.log('merged right');
+              maze[row][col].right = true;
               merged = true;
             }
           }
         }
         if (directions[i] == 'down') {
-          console.log('tried to merge down');
           availableMergeAttempts--;
           if (row==size-1) {
             i=0
@@ -210,48 +209,115 @@ MYGAME.graphics = (function() {
                                 maze[row+1][col].groupId,
                                 maze,
                                 size);
-              console.log('merged up');
+              maze[row+1][col].top = true;
               merged = true;
             }
           }
         }
         if (directions[i] == 'left') {
-          console.log('tried to merge left');
           availableMergeAttempts--;
           if (col==0) {
             i=1
           } else {
-            if (maze[row][col].groupId != maze[row][col+1].groupId) {
+            if (maze[row][col].groupId != maze[row][col-1].groupId) {
               // Weve got a merge cus the groupId's are different!
               maze = mergeGroup(maze[row][col].groupId,
-                                maze[row][col+1].groupId,
+                                maze[row][col-1].groupId,
                                 maze,
                                 size);
-              console.log('merged left');
+              maze[row][col-1].right = true;
               merged = true;
             }
           }
         }
         if (availableMergeAttempts == 0) {
-          console.log('no available merge attempts for this guy... lets get a new vertex to try merging');
+          // We will move one to the right or if we are at the very last spot of the maze
+          // we will make the row and col both equal 0
+          if (row == size-1 && col == size-1) {
+            row = 0;
+            col = 0;
+          } else if (col == size-1 && row != size-1) {
+            row++;
+            col=0;
+          } else if (col != size-1 && row == size-1) {
+            row=0;
+            col++;
+          } else { //col != size-1 && row != size-1
+            row++;
+          }
+          availableMergeAttempts = 4;
+          availableMergeSpots--;
+          if (availableMergeSpots == 0) {
+            done = true;
+          }
         }
       }
     }
 
-    for (var row = 0; row < size; row++) {
-      for (var col = 0; col < size; col++) {
-        console.log(maze[row][col]);
-      }
-    }
+    // for (var row = 0; row < size; row++) {
+    //   for (var col = 0; col < size; col++) {
+    //     console.log(maze[row][col]);
+    //   }
+    // }
     
     return maze;
   }
 
+  function drawMaze(maze, size) {
+    // context.clear();
+    var canvas = document.getElementById('canvas-main');
+    var context = canvas.getContext('2d');
+
+    var cellHeight = canvas.height/size;
+    var cellWidth = canvas.width/size;
+
+    // Draw a top wall: moveTo(x, y)
+    // context.moveTo(0, 0);
+    // context.lineTo(125, 0);
+
+    // context.moveTo(125, 0);
+    // context.lineTo(250, 0);
+
+    // context.moveTo(250, 0);
+    // context.lineTo(375, 0);
+
+    // context.moveTo(375, 0);
+    // context.lineTo(500, 0);
+
+    // // Draw a right wall
+    // context.moveTo(150, 0);
+    // context.lineTo(150, 150);
+
+    var count = 1;
+    for (var y = 0; y < size; y++) {
+      for (var x = 0; x < size; x++) {
+        if (!maze[y][x].top) {
+          // console.log('TOP WALL ' + 'row ' + String(y) + ' ' + 'col ' + String(x) + ' count ' + String(count));
+          // console.log('moveTo: ' + String(x*cellWidth) + ' ' + String(y * cellHeight));
+          // console.log('lineTo: ' + String((x+1)*cellWidth) + ' ' + String(y * cellHeight));
+          context.moveTo(x * cellWidth, y * cellHeight);
+          context.lineTo((x+1) * cellWidth, y * cellHeight);
+          // console.log('Drew a top wall!!!!!')
+        }
+        console.log(maze[y][x]);
+        if (!maze[y][x].right) {
+          // console.log('RIGHT WALL' + String(maze[y][x].cellId));
+          // console.log('moveTo: ' + String((x+1)*cellWidth) + ' ' + String(y * cellHeight));
+          // console.log('lineTo: ' + String((x+1)*cellWidth) + ' ' + String((y+1) * cellHeight));
+          context.moveTo((x+1) * cellWidth, y * cellHeight);
+          context.lineTo((x+1) * cellWidth, (y+1) * cellHeight);
+        }
+        count++;
+      }
+    }
+
+    context.lineWidth = 2;
+    context.stroke();
+  }
+
   return {
-    clear : clear,
-    Triangle : Triangle,
-    Rectangle : Rectangle,
-    Maze : Maze
+    Maze : Maze,
+    drawMaze : drawMaze
   };
 }());
 
@@ -263,25 +329,26 @@ MYGAME.graphics = (function() {
 MYGAME.initialize = (function(graphics) {
 
 
-  var maze = graphics.Maze();
+  var maze = graphics.Maze(5);
+  graphics.drawMaze(maze, 5);
   // console.log(maze[0][1]);
   
-  var myTriangle = graphics.Triangle( {
-    center : {x : 150, y : 150 },
-    pt1 : { x : 100, y : 100 },
-    pt2 : { x : 200, y : 100 },
-    pt3 : { x : 150, y : 200 },
-    fill : 'rgba(150, 0, 0, 1)',
-    stroke : 'rgba(255, 0, 0, 1)',
-    lineWidth : 2,
-    rotation : 0
-  });
-  var myBox = graphics.Rectangle( {
-    x : 300, y : 100, width : 100, height : 100, 
-    fill : 'rgba(255, 150, 50, 1)', 
-    stroke : 'rgba(255, 0, 0, 1)',
-    rotation : 0
-  });
+  // var myTriangle = graphics.Triangle( {
+  //   center : {x : 150, y : 150 },
+  //   pt1 : { x : 100, y : 100 },
+  //   pt2 : { x : 200, y : 100 },
+  //   pt3 : { x : 150, y : 200 },
+  //   fill : 'rgba(150, 0, 0, 1)',
+  //   stroke : 'rgba(255, 0, 0, 1)',
+  //   lineWidth : 2,
+  //   rotation : 0
+  // });
+  // var myBox = graphics.Rectangle( {
+  //   x : 300, y : 100, width : 100, height : 100, 
+  //   fill : 'rgba(255, 150, 50, 1)', 
+  //   stroke : 'rgba(255, 0, 0, 1)',
+  //   rotation : 0
+  // });
 
   //------------------------------------------------------------------
   //
@@ -290,12 +357,12 @@ MYGAME.initialize = (function(graphics) {
   //------------------------------------------------------------------
   function gameLoop(time) {
 
-    graphics.clear();
-    myBox.draw();
-    myBox.updateRotation(0.01);
+    // graphics.clear();
+    // myBox.draw();
+    // myBox.updateRotation(0.01);
     
-    myTriangle.draw();
-    myTriangle.updateRotation(0.015);
+    // myTriangle.draw();
+    // myTriangle.updateRotation(0.015);
 
     requestAnimationFrame(gameLoop);
   }

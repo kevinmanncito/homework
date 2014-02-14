@@ -1,0 +1,9 @@
+#canvas-main {
+  border: solid 1px black;
+  display: block;
+}
+.canvas-wrapper {
+  margin: 15px auto;
+  max-width: 80%;
+  max-height: 80%;
+}
