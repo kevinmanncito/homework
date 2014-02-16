@@ -259,16 +259,69 @@ MYGAME.graphics = (function() {
 
   function solveMaze(maze, size) {
     var solutionQueue = [];
-    var mazeQueue = [];
-    for (var row = 0; row < size; row++) {
-      for (var col = 0; col < size; col++) {
-        mazeQueue.push(maze[row][col]);
-      }
-    }
 
-    for (var i = 0; i < mazeQueue.length; i++) {
-      console.log(mazeQueue[i]);
-    }
+    var findEndCell = function(row, col) {
+
+      var inPath = false;
+      maze[row][col].visited = true;
+      if (row==size-1 && col==size-1) {
+        console.log('we found the end!')
+        maze[row][col].inPath = true;
+        inPath = true;
+      }
+      // Explore up
+      if (row != 0) {
+        if (maze[row][col].top) {
+          if (!maze[row-1][col].visited) {
+            if (findEndCell(row-1, col)) {
+              inPath = true;
+            }
+          }
+        }
+      }
+      // Explore right
+      if (col != size-1) {
+        if (maze[row][col].right) {
+          if (!maze[row][col+1].visited) {
+            if(findEndCell(row, col+1)) {
+              inPath = true;
+            }
+          }
+        }
+      }
+      // Explore down
+      if (row != size-1) {
+        if (maze[row+1][col].top) {
+          if (!maze[row+1][col].visited) {
+            if (findEndCell(row+1, col)) {
+              inPath = true;
+            }
+          }
+        }
+      }
+      // Explore left
+      if (col != 0) {
+        if (maze[row][col-1].right) {
+          if (!maze[row][col-1].visited) {
+            if (findEndCell(row, col-1)) {
+              inPath = true;
+            }
+          }
+        }
+      }
+      if (inPath) {
+        maze[row][col].inPath = true;
+        solutionQueue.unshift(maze[row][col]);
+      }
+
+      return inPath;
+
+    };
+
+    findEndCell(0, 0);
+
+    return solutionQueue;
+
   }
 
   return {
@@ -288,9 +341,10 @@ MYGAME.initialize = (function(graphics) {
 
   var maze = graphics.Maze(4);
   graphics.drawMaze(maze, 4);
-  graphics.solveMaze(maze, 4);
-  // console.log(maze[0][1]);
-  
+  var solution = graphics.solveMaze(maze, 4);
+
+  console.log(solution);
+
   // var myTriangle = graphics.Triangle( {
   //   center : {x : 150, y : 150 },
   //   pt1 : { x : 100, y : 100 },
