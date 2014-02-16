@@ -9,8 +9,11 @@
 MYGAME.graphics = (function() {
   'use strict';
   
-  var canvas = document.getElementById('canvas-main');
-  var context = canvas.getContext('2d');
+  var canvasMaze = document.getElementById('canvas-maze');
+  var contextMaze = canvasMaze.getContext('2d');
+
+  var canvasExplorer = document.getElementById('canvas-maze');
+  var contextExplorer = canvasExplorer.getContext('2d');
 
   //------------------------------------------------------------------
   //
@@ -18,7 +21,7 @@ MYGAME.graphics = (function() {
   // of the canvas, rather than making a function that calls and does it.
   //
   //------------------------------------------------------------------
-  CanvasRenderingContext2D.prototype.clear = function() {
+  CanvasRenderingContext2D.prototype.clear = function(canvas) {
     this.save();
     this.setTransform(1, 0, 0, 1, 0, 0);
     this.clearRect(0, 0, canvas.width, canvas.height);
@@ -30,48 +33,30 @@ MYGAME.graphics = (function() {
   // Public function that allows the client code to clear the canvas.
   //
   //------------------------------------------------------------------
-  // function clear() {
-  //   context.clear();
-  // }
+  function clear(canvas) {
+    context.clear(canvas);
+  }
   
   //------------------------------------------------------------------
   //
-  // This is used to create a triangle function that can be used by client
-  // code for rendering.
+  // The explorer object
   //
   //------------------------------------------------------------------
-  function Triangle(spec) {
+  function Explorer(maze, size) {
     var that = {};
-    
-    that.updateRotation = function(angle) {
-      spec.rotation += angle;
+
+    that.move = function(direction, currentX, currentY) {
+
     };
-    
-    that.draw = function() {
-      context.save();
-      
-      context.translate(spec.center.x, spec.center.y);
-      context.rotate(spec.rotation);
-      context.translate(-spec.center.x, -spec.center.y);
-      
-      context.beginPath();
-      context.moveTo(spec.pt1.x, spec.pt1.y);
-      context.lineTo(spec.pt2.x, spec.pt2.y);
-      context.lineTo(spec.pt3.x, spec.pt3.y);
-      context.closePath();
-      
-      context.fillStyle = spec.fill;
-      context.fill();
-      
-      context.strokeStyle = spec.stroke;
-      context.lineWidth = spec.lineWidth;
-      context.stroke();
-      
-      context.restore();
-    };
-    
+
     return that;
   }
+
+  //------------------------------------------------------------------
+  //
+  // The maze object
+  //
+  //------------------------------------------------------------------
 
   function Maze(size) {
     var mergeGroup = function(group1, group2, maze, size) {
@@ -120,7 +105,6 @@ MYGAME.graphics = (function() {
       // and try and get a merge to happen
       var row = Math.floor(Math.random() * size);
       var col = Math.floor(Math.random() * size);
-
 
       // If not merged lets do a merge to a random adjacent cell
       // Choose a random direction to merge
@@ -224,37 +208,39 @@ MYGAME.graphics = (function() {
         }
       }
     }
-
-    // for (var row = 0; row < size; row++) {
-    //   for (var col = 0; col < size; col++) {
-    //     console.log(maze[row][col]);
-    //   }
-    // }
     
     return maze;
   }
 
   function drawMaze(maze, size) {
-    context.clear();
-    var cellHeight = canvas.height/size;
-    var cellWidth = canvas.width/size;
+    contextMaze.clear(canvasMaze);
+    var cellHeight = canvasMaze.height/size;
+    var cellWidth = canvasMaze.width/size;
 
-    var count = 1;
     for (var y = 0; y < size; y++) {
       for (var x = 0; x < size; x++) {
+        // If we are on a far left column cell lets draw a left wall
+        if (x == 0) {
+          contextMaze.moveTo(x * cellWidth, y * cellHeight);
+          contextMaze.lineTo(x * cellWidth, (y+1) * cellHeight);
+        }
+        // If we are on the bottom row lets draw a bottom wall
+        if (y == size-1) {
+          contextMaze.moveTo(x * cellWidth, (y+1) * cellHeight);
+          contextMaze.lineTo((x+1) * cellWidth, (y+1) * cellHeight);
+        }
         if (!maze[y][x].top) {
-          context.moveTo(x * cellWidth, y * cellHeight);
-          context.lineTo((x+1) * cellWidth, y * cellHeight);
+          contextMaze.moveTo(x * cellWidth, y * cellHeight);
+          contextMaze.lineTo((x+1) * cellWidth, y * cellHeight);
         }
         if (!maze[y][x].right) {
-          context.moveTo((x+1) * cellWidth, y * cellHeight);
-          context.lineTo((x+1) * cellWidth, (y+1) * cellHeight);
+          contextMaze.moveTo((x+1) * cellWidth, y * cellHeight);
+          contextMaze.lineTo((x+1) * cellWidth, (y+1) * cellHeight);
         }
-        count++;
       }
     }
-    context.lineWidth = 2;
-    context.stroke();
+    contextMaze.lineWidth = 2;
+    contextMaze.stroke();
   }
 
   function solveMaze(maze, size) {
@@ -265,7 +251,6 @@ MYGAME.graphics = (function() {
       var inPath = false;
       maze[row][col].visited = true;
       if (row==size-1 && col==size-1) {
-        console.log('we found the end!')
         maze[row][col].inPath = true;
         inPath = true;
       }
@@ -326,6 +311,7 @@ MYGAME.graphics = (function() {
 
   return {
     Maze : Maze,
+    Explorer : Explorer,
     drawMaze : drawMaze,
     solveMaze : solveMaze
   };
@@ -336,31 +322,20 @@ MYGAME.graphics = (function() {
 // This function performs the one-time game initialization.
 //
 //------------------------------------------------------------------
-MYGAME.initialize = (function(graphics) {
+MYGAME.initialize = (function initialize(graphics, images, input) {
 
 
-  var maze = graphics.Maze(4);
-  graphics.drawMaze(maze, 4);
-  var solution = graphics.solveMaze(maze, 4);
+  var maze = graphics.Maze(10);
+  graphics.drawMaze(maze, 10);
 
-  console.log(solution);
+  var explorer = graphics.Explorer(maze, 10);
 
-  // var myTriangle = graphics.Triangle( {
-  //   center : {x : 150, y : 150 },
-  //   pt1 : { x : 100, y : 100 },
-  //   pt2 : { x : 200, y : 100 },
-  //   pt3 : { x : 150, y : 200 },
-  //   fill : 'rgba(150, 0, 0, 1)',
-  //   stroke : 'rgba(255, 0, 0, 1)',
-  //   lineWidth : 2,
-  //   rotation : 0
-  // });
-  // var myBox = graphics.Rectangle( {
-  //   x : 300, y : 100, width : 100, height : 100, 
-  //   fill : 'rgba(255, 150, 50, 1)', 
-  //   stroke : 'rgba(255, 0, 0, 1)',
-  //   rotation : 0
-  // });
+  var solution = graphics.solveMaze(maze, 10);
+
+  var keyboard = input.Keyboard();
+
+  var lastTimeStamp = performance.now();
+
 
   //------------------------------------------------------------------
   //
@@ -369,6 +344,10 @@ MYGAME.initialize = (function(graphics) {
   //------------------------------------------------------------------
   function gameLoop(time) {
 
+    elapsedTime = time - lastTimeStamp;
+    lastTimeStamp = time;
+
+    keyboard.update(elapsedTime);
     // graphics.clear();
     // myBox.draw();
     // myBox.updateRotation(0.01);
@@ -383,4 +362,4 @@ MYGAME.initialize = (function(graphics) {
     console.log('game initializing...');
     requestAnimationFrame(gameLoop); 
   };
-}(MYGAME.graphics));
+}(MYGAME.graphics, MYGAME.images, MYGAME.input));

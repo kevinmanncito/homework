@@ -1,4 +1,5 @@
 var MYGAME = {
+  images: {},
 
   status : {
     preloadRequest : 0,
@@ -18,6 +19,7 @@ window.addEventListener('load', function() {
   Modernizr.load([
     {
       load : [
+        'preload!scripts/input.js',
         'preload!scripts/renderer.js'
       ],
       complete : function() {
