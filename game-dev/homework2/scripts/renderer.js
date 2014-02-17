@@ -43,6 +43,9 @@ MYGAME.graphics = (function() {
   //
   //------------------------------------------------------------------
   function Explorer(maze, size) {
+    var findCurrentCell = function(x, y) {
+      
+    }
     var that = {};
 
     that.currentX = 0;
