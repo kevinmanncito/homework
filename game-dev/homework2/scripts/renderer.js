@@ -49,8 +49,24 @@ MYGAME.graphics = (function() {
     that.currentY = 0;
     that.cellHeight = canvasExplorer.height/size;
     that.cellWidth = canvasExplorer.width/size;
-    that.radius = (that.cellWidth/2)-(0.20*(that.cellWidth/2));
+    that.radius = (that.cellWidth/2)-(0.40*(that.cellWidth/2));
     that.maze = maze;
+
+    that.checkMove = function(direction) {
+      var canMove = false;
+      if (direction === 'right') {
+
+      } else if (direction === 'left') {
+
+      } else if (direction === 'up') {
+
+      } else if (direction === 'down') {
+
+      } else {
+        return false;
+      }
+      return canMove;
+    };
 
     that.createAndDrawExplorer = function() {
       contextExplorer.clear(canvasExplorer);
