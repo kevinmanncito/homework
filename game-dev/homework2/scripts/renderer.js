@@ -42,11 +42,35 @@ MYGAME.graphics = (function() {
   // The explorer object
   //
   //------------------------------------------------------------------
-  function Explorer(maze, size) {
+  function Explorer() {
     var that = {};
 
-    that.move = function(direction, currentX, currentY) {
+    that.createAndDrawExplorer = function(maze, size) {
+      // contextExplorer.clear(canvasExplorer);
 
+      var cellHeight = canvasExplorer.height/size;
+      var cellWidth = canvasExplorer.width/size;
+      var radius = (cellWidth/2)-(0.20*(cellWidth/2));
+
+      contextExplorer.beginPath();
+      contextExplorer.arc(cellHeight/2, cellWidth/2 , radius, 0, 2*Math.PI);
+      contextExplorer.stroke();
+    };
+
+    that.moveRight = function(elapsedTime) {
+      console.log('right');
+    };
+
+    that.moveLeft = function(elapsedTime) {
+      console.log('left');
+    };
+
+    that.moveUp = function(elapsedTime) {
+      console.log('up');
+    };
+
+    that.moveDown = function(elapsedTime) {
+      console.log('down');
     };
 
     return that;
@@ -57,263 +81,281 @@ MYGAME.graphics = (function() {
   // The maze object
   //
   //------------------------------------------------------------------
+  function Maze() {
+    var that = {};
 
-  function Maze(size) {
-    var mergeGroup = function(group1, group2, maze, size) {
+    //------------------------------------------------------------------
+    //
+    // Method that creates and returns the 2D maze array (array filled with
+    // cell objects)
+    //
+    //------------------------------------------------------------------
+    that.createMaze = function(size) {
+      var mergeGroup = function(group1, group2, maze, size) {
+        for (var row = 0; row < size; row++) {
+          for (var col = 0; col < size; col++) {
+            if (maze[row][col].groupId == group2) {
+              maze[row][col].groupId = group1;
+            }
+          }
+        }
+        return maze;
+      };
+      var maze = [];
+      var directions = ['up', 'right', 'down', 'left'];
+      // directions[0] = up
+      // directions[1] = right
+      // directions[2] = down
+      // directions[3] = left
+      var id = 1;
+
+      // Initialize the maze array
+      // false means there is a wall there
+      for (var i = 0; i < size; i++) {
+        maze.push([]);
+      };
       for (var row = 0; row < size; row++) {
         for (var col = 0; col < size; col++) {
-          if (maze[row][col].groupId == group2) {
-            maze[row][col].groupId = group1;
+          maze[row].push({
+            top:     false,
+            right:   false,
+            groupId: id,
+            cellId:  id*10,
+            visited: false,
+            inPath:  false
+          });
+          id++;
+        }
+      };
+
+      // Use kruskels algorithm to create the maze
+      // Each time we loop through there will be one less groupId
+      // the maze is done drawing when there is only one group id
+      var mergeCount = 0;
+      while (mergeCount < size*size-1) {
+        // Get two random indices for the row and column
+        // and try and get a merge to happen
+        var row = Math.floor(Math.random() * size);
+        var col = Math.floor(Math.random() * size);
+
+        // If not merged lets do a merge to a random adjacent cell
+        // Choose a random direction to merge
+        var i = Math.floor(Math.random() * 4);
+        var merged = false;
+        var availableMergeAttempts = 4;
+        var availableMergeSpots = size*size+1;
+        var done = false;
+        while(!merged && !done) {
+          if (directions[i] == 'up') {
+            availableMergeAttempts--;
+
+            // Check to make sure were not merging out of the upper wall
+            if (row==0) {
+              i = 2;
+            } else { // If not, check if a merge is available
+              if (maze[row][col].groupId != maze[row-1][col].groupId) {
+                // Weve got a merge cus the groupId's are different!
+                maze = mergeGroup(maze[row][col].groupId,
+                                  maze[row-1][col].groupId,
+                                  maze,
+                                  size);
+                maze[row][col].top = true;
+                merged = true;
+                mergeCount++;
+              } else {
+                i++;
+              }
+            }
+          }
+          if (directions[i] == 'right') {
+            availableMergeAttempts--;
+            // Check to make sure were not merging out of the right wall
+            if (col==size-1) {
+              i = 3;
+            } else {
+              if (maze[row][col].groupId != maze[row][col+1].groupId) {
+                // Weve got a merge cus the groupId's are different!
+                maze = mergeGroup(maze[row][col].groupId,
+                                  maze[row][col+1].groupId,
+                                  maze,
+                                  size);
+                maze[row][col].right = true;
+                merged = true;
+                mergeCount++;
+              }
+            }
+          }
+          if (directions[i] == 'down') {
+            availableMergeAttempts--;
+            if (row==size-1) {
+              i=0
+            } else {
+              if (maze[row][col].groupId != maze[row+1][col].groupId) {
+                // Weve got a merge cus the groupId's are different!
+                maze = mergeGroup(maze[row][col].groupId,
+                                  maze[row+1][col].groupId,
+                                  maze,
+                                  size);
+                maze[row+1][col].top = true;
+                merged = true;
+                mergeCount++;
+              }
+            }
+          }
+          if (directions[i] == 'left') {
+            availableMergeAttempts--;
+            if (col==0) {
+              i=1
+            } else {
+              if (maze[row][col].groupId != maze[row][col-1].groupId) {
+                // Weve got a merge cus the groupId's are different!
+                maze = mergeGroup(maze[row][col].groupId,
+                                  maze[row][col-1].groupId,
+                                  maze,
+                                  size);
+                maze[row][col-1].right = true;
+                merged = true;
+                mergeCount++;
+              }
+            }
+          }
+          if (availableMergeAttempts == 0) {
+            // We will move one to the right or if we are at the very last spot of the maze
+            // we will make the row and col both equal 0
+            if (col != size-1) {
+              col++;
+            } else if (row != size-1 && col == size-1) {
+              row++;
+              col=0;
+            } else if (row == size-1 && col == size-1) {
+              col=0;
+              row=0;
+            }
+
+            availableMergeAttempts = 4;
+            availableMergeSpots--;
+            if (availableMergeSpots == 0) {
+              done = true;
+            }
           }
         }
       }
       return maze;
     };
-    var maze = [];
-    var directions = ['up', 'right', 'down', 'left'];
-    // directions[0] = up
-    // directions[1] = right
-    // directions[2] = down
-    // directions[3] = left
-    var id = 1;
 
-    // Initialize the maze array
-    // false means there is a wall there
-    for (var i = 0; i < size; i++) {
-      maze.push([]);
-    };
-    for (var row = 0; row < size; row++) {
-      for (var col = 0; col < size; col++) {
-        maze[row].push({
-          top:     false,
-          right:   false,
-          groupId: id,
-          cellId:  id*10,
-          visited: false,
-          inPath:  false
-        });
-        id++;
-      }
-    };
+    //------------------------------------------------------------------
+    //
+    // Method that draws the maze to the canvas
+    //
+    //------------------------------------------------------------------
+    that.drawMaze = function(maze, size) {
+      contextMaze.clear(canvasMaze);
+      var cellHeight = canvasMaze.height/size;
+      var cellWidth = canvasMaze.width/size;
 
-    // Use kruskels algorithm to create the maze
-    // Each time we loop through there will be one less groupId
-    // the maze is done drawing when there is only one group id
-    var mergeCount = 0;
-    while (mergeCount < size*size-1) {
-      // Get two random indices for the row and column
-      // and try and get a merge to happen
-      var row = Math.floor(Math.random() * size);
-      var col = Math.floor(Math.random() * size);
-
-      // If not merged lets do a merge to a random adjacent cell
-      // Choose a random direction to merge
-      var i = Math.floor(Math.random() * 4);
-      var merged = false;
-      var availableMergeAttempts = 4;
-      var availableMergeSpots = size*size+1;
-      var done = false;
-      while(!merged && !done) {
-        if (directions[i] == 'up') {
-          availableMergeAttempts--;
-
-          // Check to make sure were not merging out of the upper wall
-          if (row==0) {
-            i = 2;
-          } else { // If not, check if a merge is available
-            if (maze[row][col].groupId != maze[row-1][col].groupId) {
-              // Weve got a merge cus the groupId's are different!
-              maze = mergeGroup(maze[row][col].groupId,
-                                maze[row-1][col].groupId,
-                                maze,
-                                size);
-              maze[row][col].top = true;
-              merged = true;
-              mergeCount++;
-            } else {
-              i++;
-            }
+      for (var y = 0; y < size; y++) {
+        for (var x = 0; x < size; x++) {
+          // If we are on a far left column cell lets draw a left wall
+          if (x == 0) {
+            contextMaze.moveTo(x * cellWidth, y * cellHeight);
+            contextMaze.lineTo(x * cellWidth, (y+1) * cellHeight);
           }
-        }
-        if (directions[i] == 'right') {
-          availableMergeAttempts--;
-          // Check to make sure were not merging out of the right wall
-          if (col==size-1) {
-            i = 3;
-          } else {
-            if (maze[row][col].groupId != maze[row][col+1].groupId) {
-              // Weve got a merge cus the groupId's are different!
-              maze = mergeGroup(maze[row][col].groupId,
-                                maze[row][col+1].groupId,
-                                maze,
-                                size);
-              maze[row][col].right = true;
-              merged = true;
-              mergeCount++;
-            }
+          // If we are on the bottom row lets draw a bottom wall
+          if (y == size-1) {
+            contextMaze.moveTo(x * cellWidth, (y+1) * cellHeight);
+            contextMaze.lineTo((x+1) * cellWidth, (y+1) * cellHeight);
           }
-        }
-        if (directions[i] == 'down') {
-          availableMergeAttempts--;
-          if (row==size-1) {
-            i=0
-          } else {
-            if (maze[row][col].groupId != maze[row+1][col].groupId) {
-              // Weve got a merge cus the groupId's are different!
-              maze = mergeGroup(maze[row][col].groupId,
-                                maze[row+1][col].groupId,
-                                maze,
-                                size);
-              maze[row+1][col].top = true;
-              merged = true;
-              mergeCount++;
-            }
+          if (!maze[y][x].top) {
+            contextMaze.moveTo(x * cellWidth, y * cellHeight);
+            contextMaze.lineTo((x+1) * cellWidth, y * cellHeight);
           }
-        }
-        if (directions[i] == 'left') {
-          availableMergeAttempts--;
-          if (col==0) {
-            i=1
-          } else {
-            if (maze[row][col].groupId != maze[row][col-1].groupId) {
-              // Weve got a merge cus the groupId's are different!
-              maze = mergeGroup(maze[row][col].groupId,
-                                maze[row][col-1].groupId,
-                                maze,
-                                size);
-              maze[row][col-1].right = true;
-              merged = true;
-              mergeCount++;
-            }
-          }
-        }
-        if (availableMergeAttempts == 0) {
-          // We will move one to the right or if we are at the very last spot of the maze
-          // we will make the row and col both equal 0
-          if (col != size-1) {
-            col++;
-          } else if (row != size-1 && col == size-1) {
-            row++;
-            col=0;
-          } else if (row == size-1 && col == size-1) {
-            col=0;
-            row=0;
-          }
-
-          availableMergeAttempts = 4;
-          availableMergeSpots--;
-          if (availableMergeSpots == 0) {
-            done = true;
+          if (!maze[y][x].right) {
+            contextMaze.moveTo((x+1) * cellWidth, y * cellHeight);
+            contextMaze.lineTo((x+1) * cellWidth, (y+1) * cellHeight);
           }
         }
       }
-    }
-    
-    return maze;
-  }
-
-  function drawMaze(maze, size) {
-    contextMaze.clear(canvasMaze);
-    var cellHeight = canvasMaze.height/size;
-    var cellWidth = canvasMaze.width/size;
-
-    for (var y = 0; y < size; y++) {
-      for (var x = 0; x < size; x++) {
-        // If we are on a far left column cell lets draw a left wall
-        if (x == 0) {
-          contextMaze.moveTo(x * cellWidth, y * cellHeight);
-          contextMaze.lineTo(x * cellWidth, (y+1) * cellHeight);
-        }
-        // If we are on the bottom row lets draw a bottom wall
-        if (y == size-1) {
-          contextMaze.moveTo(x * cellWidth, (y+1) * cellHeight);
-          contextMaze.lineTo((x+1) * cellWidth, (y+1) * cellHeight);
-        }
-        if (!maze[y][x].top) {
-          contextMaze.moveTo(x * cellWidth, y * cellHeight);
-          contextMaze.lineTo((x+1) * cellWidth, y * cellHeight);
-        }
-        if (!maze[y][x].right) {
-          contextMaze.moveTo((x+1) * cellWidth, y * cellHeight);
-          contextMaze.lineTo((x+1) * cellWidth, (y+1) * cellHeight);
-        }
-      }
-    }
-    contextMaze.lineWidth = 2;
-    contextMaze.stroke();
-  }
-
-  function solveMaze(maze, size) {
-    var solutionQueue = [];
-
-    var findEndCell = function(row, col) {
-
-      var inPath = false;
-      maze[row][col].visited = true;
-      if (row==size-1 && col==size-1) {
-        maze[row][col].inPath = true;
-        inPath = true;
-      }
-      // Explore up
-      if (row != 0) {
-        if (maze[row][col].top) {
-          if (!maze[row-1][col].visited) {
-            if (findEndCell(row-1, col)) {
-              inPath = true;
-            }
-          }
-        }
-      }
-      // Explore right
-      if (col != size-1) {
-        if (maze[row][col].right) {
-          if (!maze[row][col+1].visited) {
-            if(findEndCell(row, col+1)) {
-              inPath = true;
-            }
-          }
-        }
-      }
-      // Explore down
-      if (row != size-1) {
-        if (maze[row+1][col].top) {
-          if (!maze[row+1][col].visited) {
-            if (findEndCell(row+1, col)) {
-              inPath = true;
-            }
-          }
-        }
-      }
-      // Explore left
-      if (col != 0) {
-        if (maze[row][col-1].right) {
-          if (!maze[row][col-1].visited) {
-            if (findEndCell(row, col-1)) {
-              inPath = true;
-            }
-          }
-        }
-      }
-      if (inPath) {
-        maze[row][col].inPath = true;
-        solutionQueue.unshift(maze[row][col]);
-      }
-
-      return inPath;
-
+      contextMaze.lineWidth = 2;
+      contextMaze.stroke();
     };
 
-    findEndCell(0, 0);
+    //------------------------------------------------------------------
+    //
+    // Method that returns a list of cell objects in the correct path
+    //
+    //------------------------------------------------------------------
+    that.solveMaze = function(maze, size) {
+      var solutionQueue = [];
 
-    return solutionQueue;
+      var findEndCell = function(row, col) {
 
+        var inPath = false;
+        maze[row][col].visited = true;
+        if (row==size-1 && col==size-1) {
+          maze[row][col].inPath = true;
+          inPath = true;
+        }
+        // Explore up
+        if (row != 0) {
+          if (maze[row][col].top) {
+            if (!maze[row-1][col].visited) {
+              if (findEndCell(row-1, col)) {
+                inPath = true;
+              }
+            }
+          }
+        }
+        // Explore right
+        if (col != size-1) {
+          if (maze[row][col].right) {
+            if (!maze[row][col+1].visited) {
+              if(findEndCell(row, col+1)) {
+                inPath = true;
+              }
+            }
+          }
+        }
+        // Explore down
+        if (row != size-1) {
+          if (maze[row+1][col].top) {
+            if (!maze[row+1][col].visited) {
+              if (findEndCell(row+1, col)) {
+                inPath = true;
+              }
+            }
+          }
+        }
+        // Explore left
+        if (col != 0) {
+          if (maze[row][col-1].right) {
+            if (!maze[row][col-1].visited) {
+              if (findEndCell(row, col-1)) {
+                inPath = true;
+              }
+            }
+          }
+        }
+        if (inPath) {
+          maze[row][col].inPath = true;
+          solutionQueue.unshift(maze[row][col]);
+        }
+
+        return inPath;
+
+      };
+
+      findEndCell(0, 0);
+
+      return solutionQueue;
+      
+    };
+
+    return that;
   }
 
   return {
     Maze : Maze,
-    Explorer : Explorer,
-    drawMaze : drawMaze,
-    solveMaze : solveMaze
+    Explorer : Explorer
   };
 }());
 
@@ -325,17 +367,18 @@ MYGAME.graphics = (function() {
 MYGAME.initialize = (function initialize(graphics, images, input) {
 
 
-  var maze = graphics.Maze(10);
-  graphics.drawMaze(maze, 10);
+  var maze = graphics.Maze();
+  var mazeArray = maze.createMaze(10);
+  maze.drawMaze(mazeArray, 10);
+  var solution = maze.solveMaze(mazeArray, 10);
 
-  var explorer = graphics.Explorer(maze, 10);
+  var explorer = graphics.Explorer();
 
-  var solution = graphics.solveMaze(maze, 10);
+  explorer.createAndDrawExplorer(mazeArray, 10);
 
   var keyboard = input.Keyboard();
 
   var lastTimeStamp = performance.now();
-
 
   //------------------------------------------------------------------
   //
@@ -360,6 +403,12 @@ MYGAME.initialize = (function initialize(graphics, images, input) {
 
   return function() {
     console.log('game initializing...');
+
+    keyboard.registerCommand(KeyEvent.DOM_VK_LEFT, explorer.moveLeft);
+    keyboard.registerCommand(KeyEvent.DOM_VK_RIGHT, explorer.moveRight);
+    keyboard.registerCommand(KeyEvent.DOM_VK_UP, explorer.moveUp);
+    keyboard.registerCommand(KeyEvent.DOM_VK_DOWN, explorer.moveDown);
+
     requestAnimationFrame(gameLoop); 
   };
 }(MYGAME.graphics, MYGAME.images, MYGAME.input));
