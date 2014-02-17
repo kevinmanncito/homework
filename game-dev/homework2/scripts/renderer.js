@@ -12,7 +12,7 @@ MYGAME.graphics = (function() {
   var canvasMaze = document.getElementById('canvas-maze');
   var contextMaze = canvasMaze.getContext('2d');
 
-  var canvasExplorer = document.getElementById('canvas-maze');
+  var canvasExplorer = document.getElementById('canvas-explorer');
   var contextExplorer = canvasExplorer.getContext('2d');
 
   //------------------------------------------------------------------
@@ -42,34 +42,60 @@ MYGAME.graphics = (function() {
   // The explorer object
   //
   //------------------------------------------------------------------
-  function Explorer() {
+  function Explorer(maze, size) {
     var that = {};
 
-    that.createAndDrawExplorer = function(maze, size) {
-      // contextExplorer.clear(canvasExplorer);
+    that.currentX = 0;
+    that.currentY = 0;
+    that.cellHeight = canvasExplorer.height/size;
+    that.cellWidth = canvasExplorer.width/size;
+    that.radius = (that.cellWidth/2)-(0.20*(that.cellWidth/2));
+    that.maze = maze;
 
-      var cellHeight = canvasExplorer.height/size;
-      var cellWidth = canvasExplorer.width/size;
-      var radius = (cellWidth/2)-(0.20*(cellWidth/2));
+    that.createAndDrawExplorer = function() {
+      contextExplorer.clear(canvasExplorer);
+
+      that.currentX = that.cellHeight/2;
+      that.currentY = that.cellHeight/2;
 
       contextExplorer.beginPath();
-      contextExplorer.arc(cellHeight/2, cellWidth/2 , radius, 0, 2*Math.PI);
+      contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
       contextExplorer.stroke();
     };
 
     that.moveRight = function(elapsedTime) {
+      contextExplorer.clear(canvasExplorer);
+      contextExplorer.beginPath();
+      that.currentX = that.currentX + 2;
+      contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
+      contextExplorer.stroke();
       console.log('right');
     };
 
     that.moveLeft = function(elapsedTime) {
+      contextExplorer.clear(canvasExplorer);
+      contextExplorer.beginPath();
+      that.currentX = that.currentX - 2;
+      contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
+      contextExplorer.stroke();
       console.log('left');
     };
 
     that.moveUp = function(elapsedTime) {
+      contextExplorer.clear(canvasExplorer);
+      contextExplorer.beginPath();
+      that.currentY = that.currentY - 2;
+      contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
+      contextExplorer.stroke();
       console.log('up');
     };
 
     that.moveDown = function(elapsedTime) {
+      contextExplorer.clear(canvasExplorer);
+      contextExplorer.beginPath();
+      that.currentY = that.currentY + 2;
+      contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
+      contextExplorer.stroke();
       console.log('down');
     };
 
@@ -372,9 +398,9 @@ MYGAME.initialize = (function initialize(graphics, images, input) {
   maze.drawMaze(mazeArray, 10);
   var solution = maze.solveMaze(mazeArray, 10);
 
-  var explorer = graphics.Explorer();
+  var explorer = graphics.Explorer(mazeArray, 10);
 
-  explorer.createAndDrawExplorer(mazeArray, 10);
+  explorer.createAndDrawExplorer();
 
   var keyboard = input.Keyboard();
 
