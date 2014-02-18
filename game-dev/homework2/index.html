@@ -9,9 +9,21 @@
   <script src = "scripts/loader.js"></script>
 </head>
 <body>
+<div class="nav">
+  <button id="newGame">New Game</button>
+  <button id="highScores">High Scores</button>
+  <button id="credits">Credits</button>
+  <form action="">
+    <input type="radio" name="difficulty" value="5">&nbsp;Easy (5 x 5)<br>
+    <input type="radio" name="difficulty" value="10" checked="checked">&nbsp;Normal (10 x 10)<br>
+    <input type="radio" name="difficulty" value="15">&nbsp;Heroic (15 x 15)<br>
+    <input type="radio" name="difficulty" value="20">&nbsp;Legendary (20 x 20)<br>
+  </form>
+</div>
   <div class="canvas-wrapper">
     <canvas id="canvas-maze" width="500" height="500" style="width: 100%; height: 100%;"></canvas>
     <canvas id="canvas-explorer" width="500" height="500" style="width: 100%; height: 100%;"></canvas>
+    <canvas id="canvas-path" width="500" height="500" style="width: 100%; height: 100%;"></canvas>
   </div>
 </body>
 </html>

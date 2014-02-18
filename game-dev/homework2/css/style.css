@@ -4,8 +4,16 @@
   right: 0;
   outline: solid 1px black;
   display: block;
+  z-index: 50;
 }
 #canvas-explorer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: block;
+  z-index: 100;
+}
+#canvas-path {
   position: absolute;
   top: 0;
   right: 0;
@@ -20,4 +28,7 @@
   display: block;
   height: 500px;
   width: 500px;
+}
+.nav {
+  padding: 10px;
 }

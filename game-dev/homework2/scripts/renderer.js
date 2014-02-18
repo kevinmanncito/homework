@@ -15,6 +15,9 @@ MYGAME.graphics = (function() {
   var canvasExplorer = document.getElementById('canvas-explorer');
   var contextExplorer = canvasExplorer.getContext('2d');
 
+  var canvasPath = document.getElementById('canvas-path');
+  var contextPath = canvasPath.getContext('2d');
+
   //------------------------------------------------------------------
   //
   // Place a 'clear' function on the Canvas prototype, this makes it a part
@@ -36,86 +39,261 @@ MYGAME.graphics = (function() {
   function clear(canvas) {
     context.clear(canvas);
   }
+
+  //------------------------------------------------------------------
+  //
+  // The Path object
+  //
+  //------------------------------------------------------------------
+  function Path(maze, size, correctPath) {
+    contextPath.clear(canvasPath);
+    var that = {};
+
+    that.maze = maze;
+    that.size = size;
+
+    that.correctPath = correctPath;
+
+    that.visitedStack = [];
+    that.visitedStack.push({row: 0, col: 0});
+    that.cellHeight = canvasExplorer.height/size;
+    that.cellWidth = canvasExplorer.width/size;
+
+    that.highlightCell = function(color, currentCellIndices) {
+      if (color === 'blue') {
+        contextPath.fillStyle="#839FC6";
+        contextPath.beginPath();
+        contextPath.fillRect(currentCellIndices.col*that.cellWidth, currentCellIndices.row*that.cellHeight, that.cellWidth, that.cellHeight);
+        contextPath.closePath();
+      }
+      if (color === 'green') {
+        contextPath.fillStyle="#A1DD88";
+        contextPath.beginPath();
+        contextPath.fillRect(currentCellIndices.col*that.cellWidth, currentCellIndices.row*that.cellHeight, that.cellWidth, that.cellHeight);
+        contextPath.closePath();
+      }
+    };
+
+    that.updateBreadcrumb = function(currentCellIndices) {
+      // Check if the current cell indices are in the visited stack
+      var inStack = false;
+      for (var i = 0; i < that.visitedStack.length; i++) {
+        if (that.visitedStack[i].row === currentCellIndices.row && that.visitedStack[i].col === currentCellIndices.col) {
+          inStack = true;
+        }
+      }
+      if (!inStack) {
+        that.visitedStack.push(currentCellIndices);
+      }
+    };
+
+    that.updateCorrectPath = function(currentCellIndices) {
+      if (that.maze[currentCellIndices.row][currentCellIndices.col].cellId !== size*size*10) {
+        if (that.maze[currentCellIndices.row][currentCellIndices.col].cellId === that.correctPath[0].cellId) {
+          that.correctPath.shift();
+        }
+      }
+    };
+
+    that.showCorrectPath = function(elapsedTime) {
+      var indices = {row: correctPath[0].row, col: correctPath[0].col};
+      that.highlightCell('green', indices);
+    };
+
+    that.renderPath = function() {
+      for (var i = 0; i < that.visitedStack.length; i++) {
+        that.highlightCell('blue', that.visitedStack[i]);
+      }
+      that.highlightCell('green', {row: that.size-1, col: that.size-1})
+    };
+
+    return that;
+  }
   
   //------------------------------------------------------------------
   //
-  // The explorer object
+  // The Explorer object
   //
   //------------------------------------------------------------------
   function Explorer(maze, size) {
-    var findCurrentCell = function(x, y) {
-      
-    }
     var that = {};
 
     that.currentX = 0;
     that.currentY = 0;
     that.cellHeight = canvasExplorer.height/size;
     that.cellWidth = canvasExplorer.width/size;
-    that.radius = (that.cellWidth/2)-(0.40*(that.cellWidth/2));
+    that.radius = (that.cellWidth/2)-(0.75*(that.cellWidth/2));
+    // Reset the visited flag for the score count
+    for (var row = 0; row < size-1; row++) {
+      for (var col = 0; col < size-1; col++) {
+        maze[row][col].visited = false;
+      }
+    }
     that.maze = maze;
+    console.log(that.maze);
+    that.score = 0;
+
+    that.findFutureCell = function(direction) {
+      // The idea here is that if any part of the circle will be in a different cell we 
+      // consider that we are in the new cell
+      if (direction === 'left') {
+        var yIndex = Math.floor((that.currentX-1-that.radius) / that.cellWidth);
+        var xIndex = Math.floor((that.currentY+1+that.radius) / that.cellHeight);
+      } else if (direction === 'right') {
+        var yIndex = Math.floor((that.currentX+1+that.radius) / that.cellWidth);
+        var xIndex = Math.floor((that.currentY+1+that.radius) / that.cellHeight);
+      } else if (direction === 'up') {
+        var yIndex = Math.floor((that.currentX+1+that.radius) / that.cellWidth);
+        var xIndex = Math.floor((that.currentY-1-that.radius) / that.cellHeight);
+      } else if (direction === 'down') {
+        var yIndex = Math.floor((that.currentX+1+that.radius) / that.cellWidth);
+        var xIndex = Math.floor((that.currentY+1+that.radius) / that.cellHeight);
+      } else {
+        var yIndex = Math.floor((that.currentX+1+that.radius) / that.cellWidth);
+        var xIndex = Math.floor((that.currentY+1+that.radius) / that.cellHeight);
+      }
+      return {row: xIndex, col: yIndex};
+    };
+
+    that.findCurrentCell = function() {
+      var col = Math.floor((that.currentX) / that.cellWidth);
+      var row = Math.floor((that.currentY) / that.cellHeight);
+      // Calculate the score
+      if (that.maze[row][col].inPath && !that.maze[row][col].visited) {
+        console.log('adding 3');
+        that.score = that.score + 3;
+      }
+      if (!that.maze[row][col].inPath && !that.maze[row][col].visited){
+        console.log('removing 1');
+        that.score = that.score - 1
+      }
+      that.maze[row][col].visited = true;
+      return {row: row, col: col};
+    };
 
     that.checkMove = function(direction) {
-      var canMove = false;
-      if (direction === 'right') {
+      var canMove = true;
+      var futureCellIndices = that.findFutureCell(direction);
+      var currentCellIndices = that.findCurrentCell();
 
-      } else if (direction === 'left') {
-
-      } else if (direction === 'up') {
-
-      } else if (direction === 'down') {
-
-      } else {
+      // This forces the explorer to respect the entire perimiter
+      if (futureCellIndices.row < 0 || futureCellIndices.col < 0) {
         return false;
       }
+      if (futureCellIndices.row > size-1 || futureCellIndices.col > size-1) {
+        return false;
+      }
+      if (direction === 'right') {
+        if (currentCellIndices.col === futureCellIndices.col) {
+          canMove = true;
+        } else {
+          if (that.maze[currentCellIndices.row][currentCellIndices.col].right) {
+            canMove = true;
+          } else {
+            canMove = false;
+          }
+        }
+      } else if (direction === 'left') {
+        if (currentCellIndices.col === futureCellIndices.col) {
+          canMove = true;
+        } else {
+          if (that.maze[futureCellIndices.row][futureCellIndices.col].right) {
+            canMove = true;
+          } else {
+            canMove = false;
+          }
+        }
+      } else if (direction === 'up') {
+        if (currentCellIndices.row === futureCellIndices.row) {
+          canMove = true;
+        } else {
+          if (that.maze[currentCellIndices.row][currentCellIndices.col].top) {
+            canMove = true;
+          } else {
+            canMove = false;
+          }
+        }
+      } else if (direction === 'down') {
+        if (currentCellIndices.row === futureCellIndices.row) {
+          canMove = true;
+        } else {
+          if (that.maze[futureCellIndices.row][futureCellIndices.col].top) {
+            canMove = true;
+          } else {
+            canMove = false;
+          }
+        }
+      }
+
       return canMove;
     };
 
     that.createAndDrawExplorer = function() {
       contextExplorer.clear(canvasExplorer);
-
       that.currentX = that.cellHeight/2;
       that.currentY = that.cellHeight/2;
-
+      contextExplorer.fillStyle="#DBB141";
       contextExplorer.beginPath();
       contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
+      contextExplorer.closePath();
+      contextExplorer.fill();
       contextExplorer.stroke();
     };
 
     that.moveRight = function(elapsedTime) {
-      contextExplorer.clear(canvasExplorer);
-      contextExplorer.beginPath();
-      that.currentX = that.currentX + 2;
-      contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
-      contextExplorer.stroke();
-      console.log('right');
+      if (that.checkMove('right')) {
+        contextExplorer.clear(canvasExplorer);
+        contextExplorer.fillStyle="#DBB141";
+        contextExplorer.beginPath();
+        that.currentX = that.currentX + 2;
+        contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
+        contextExplorer.closePath();
+        contextExplorer.fill();
+        contextExplorer.stroke();
+      }
     };
 
     that.moveLeft = function(elapsedTime) {
-      contextExplorer.clear(canvasExplorer);
-      contextExplorer.beginPath();
-      that.currentX = that.currentX - 2;
-      contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
-      contextExplorer.stroke();
-      console.log('left');
+      if (that.checkMove('left')) {
+        contextExplorer.clear(canvasExplorer);
+        contextExplorer.fillStyle="#DBB141";
+        contextExplorer.beginPath();
+        that.currentX = that.currentX - 2;
+        contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
+        contextExplorer.closePath();
+        contextExplorer.fill();
+        contextExplorer.stroke();
+      }
     };
 
     that.moveUp = function(elapsedTime) {
-      contextExplorer.clear(canvasExplorer);
-      contextExplorer.beginPath();
-      that.currentY = that.currentY - 2;
-      contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
-      contextExplorer.stroke();
-      console.log('up');
+      if (that.checkMove('up')) {
+        contextExplorer.clear(canvasExplorer);
+        contextExplorer.fillStyle="#DBB141";
+        contextExplorer.beginPath();
+        that.currentY = that.currentY - 2;
+        contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
+        contextExplorer.closePath();
+        contextExplorer.fill();
+        contextExplorer.stroke();
+      }
     };
 
     that.moveDown = function(elapsedTime) {
-      contextExplorer.clear(canvasExplorer);
-      contextExplorer.beginPath();
-      that.currentY = that.currentY + 2;
-      contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
-      contextExplorer.stroke();
-      console.log('down');
+      if (that.checkMove('down')) {
+        contextExplorer.clear(canvasExplorer);
+        contextExplorer.fillStyle="#DBB141";
+        contextExplorer.beginPath();
+        that.currentY = that.currentY + 2;
+        contextExplorer.arc(that.currentX, that.currentY, that.radius, 0, 2*Math.PI);
+        contextExplorer.closePath();
+        contextExplorer.fill();
+        contextExplorer.stroke();
+      }
+    };
+
+    that.getScore = function() {
+      return that.score;
     };
 
     return that;
@@ -167,7 +345,9 @@ MYGAME.graphics = (function() {
             groupId: id,
             cellId:  id*10,
             visited: false,
-            inPath:  false
+            inPath:  false,
+            row:     row,
+            col:     col 
           });
           id++;
         }
@@ -395,12 +575,14 @@ MYGAME.graphics = (function() {
       
     };
 
+
     return that;
   }
 
   return {
     Maze : Maze,
-    Explorer : Explorer
+    Explorer : Explorer,
+    Path : Path
   };
 }());
 
@@ -409,21 +591,59 @@ MYGAME.graphics = (function() {
 // This function performs the one-time game initialization.
 //
 //------------------------------------------------------------------
-MYGAME.initialize = (function initialize(graphics, images, input) {
+MYGAME.initialize = (function initialize(graphics, images, input, size) {
 
+  var size = size;
+  var lastTimeStamp = performance.now();
+  var done = false;
 
+  // Maze stuff
   var maze = graphics.Maze();
-  var mazeArray = maze.createMaze(10);
-  maze.drawMaze(mazeArray, 10);
-  var solution = maze.solveMaze(mazeArray, 10);
+  var mazeArray = maze.createMaze(size);
+  maze.drawMaze(mazeArray, size);
+  var solution = maze.solveMaze(mazeArray, size);
 
-  var explorer = graphics.Explorer(mazeArray, 10);
-
+  // Explorer stuff
+  var explorer = graphics.Explorer(mazeArray, size);
   explorer.createAndDrawExplorer();
 
+  // Path stuff
+  var path = graphics.Path(mazeArray, size, solution);
+
+  // Input stuff
   var keyboard = input.Keyboard();
 
-  var lastTimeStamp = performance.now();
+  document.getElementById('credits').onclick = function(e) {
+    alert('This game was made by Kevin Mann');
+  }
+
+  document.getElementById('highScores').onclick = function(e) {
+    alert('This game was made by Kevin Mann');
+  }
+
+  // function resetGame(newSize) {
+  //   lastTimeStamp = performance.now();
+  //   done = false;
+  //   maze = graphics.Maze();
+  //   mazeArray = maze.createMaze(newSize);
+  //   maze.drawMaze(mazeArray, newSize);
+  //   solution = maze.solveMaze(mazeArray, newSize);
+  //   explorer = graphics.Explorer(mazeArray, newSize);
+  //   explorer.createAndDrawExplorer();
+  //   path = graphics.Path(mazeArray, newSize, solution);
+  // }
+  document.getElementById('newGame').onclick = function(e) {
+    e.preventDefault();
+    var radios = document.getElementsByName('difficulty');
+    var difficulty = "";
+    for (var i = 0, length = radios.length; i < length; i++) {
+      if (radios[i].checked) {
+        difficulty = radios[i].value;
+        break;
+      }
+    }
+    MYGAME.initialize();
+  }
 
   //------------------------------------------------------------------
   //
@@ -436,14 +656,20 @@ MYGAME.initialize = (function initialize(graphics, images, input) {
     lastTimeStamp = time;
 
     keyboard.update(elapsedTime);
-    // graphics.clear();
-    // myBox.draw();
-    // myBox.updateRotation(0.01);
-    
-    // myTriangle.draw();
-    // myTriangle.updateRotation(0.015);
 
-    requestAnimationFrame(gameLoop);
+    var currentIndices = explorer.findCurrentCell();
+    if (currentIndices.row === size-1 && currentIndices.col === size-1 && !done) {
+      done = true;
+      alert("You finished! Your score was: " + explorer.getScore());
+      window.location.reload(true);
+    }
+    path.updateBreadcrumb(currentIndices);
+    path.updateCorrectPath(currentIndices);
+    path.renderPath();
+
+    if (!done) {
+      requestAnimationFrame(gameLoop);
+    }
   }
 
   return function() {
@@ -453,7 +679,8 @@ MYGAME.initialize = (function initialize(graphics, images, input) {
     keyboard.registerCommand(KeyEvent.DOM_VK_RIGHT, explorer.moveRight);
     keyboard.registerCommand(KeyEvent.DOM_VK_UP, explorer.moveUp);
     keyboard.registerCommand(KeyEvent.DOM_VK_DOWN, explorer.moveDown);
+    keyboard.registerCommand(KeyEvent.DOM_VK_H, path.showCorrectPath);
 
     requestAnimationFrame(gameLoop); 
   };
-}(MYGAME.graphics, MYGAME.images, MYGAME.input));
+}(MYGAME.graphics, MYGAME.images, MYGAME.input, 10));
