@@ -656,6 +656,7 @@ MYGAME.initialize = (function initialize(graphics, images, input, size) {
     lastTimeStamp = time;
 
     keyboard.update(elapsedTime);
+    var timer = document.getElementById('time').innerHTML = 'Time: ' + String(Math.floor(parseInt(time)/1000));
 
     var currentIndices = explorer.findCurrentCell();
     if (currentIndices.row === size-1 && currentIndices.col === size-1 && !done) {
