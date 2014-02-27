@@ -1,0 +1,25 @@
+#canvas {
+  position: absolute;
+  top: 0;
+  right: 0;
+  outline: solid 1px black;
+  display: block;
+  z-index: 50;
+}
+.canvas-wrapper {
+  margin-top: 25px;
+  margin-left: -400px;
+  position: relative;
+  top: 0;
+  left: 50%;
+  display: block;
+  height: 600px;
+  width: 800px;
+  background-image: url('../assets/Background.png');
+  background-size: 100%;
+  background-size: cover;
+  background-position: center center;
+}
+.nav {
+  padding: 10px;
+}

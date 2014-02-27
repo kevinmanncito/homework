@@ -684,4 +684,4 @@ MYGAME.initialize = (function initialize(graphics, images, input, size) {
 
     requestAnimationFrame(gameLoop); 
   };
-}(MYGAME.graphics, MYGAME.images, MYGAME.input, 10));
+}(MYGAME.graphics, MYGAME.images, MYGAME.input, 25));
