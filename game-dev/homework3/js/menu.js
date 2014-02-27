@@ -1,0 +1,3 @@
+COINGAME.menu = (function() {
+  
+}());
