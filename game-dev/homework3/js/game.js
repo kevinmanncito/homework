@@ -6,7 +6,8 @@ COINGAME.initialize = (function initialize(coins, images, menu) {
   function gameLoop(time) {
     // If we are currently playing the game lets update the coin system
     if (coinSystem.getCurrentLevel()) {
-      coinSystem.update();
+      console.log('gameLoop', coinSystem.getCurrentLevel());
+      coinSystem.update(time);
     }
     requestAnimationFrame(gameLoop);
   }

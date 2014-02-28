@@ -26,6 +26,7 @@ window.addEventListener('load', function() {
         'preload!assets/Coin-Roman.png',
         'preload!assets/Clock.png',
         'preload!assets/Coin-US-Dollary.png',
+        'preload!assets/Coin-Canadian-Dollar.png',
         'preload!assets/Dollar-Sign.png'
       ],
       complete : function() {
