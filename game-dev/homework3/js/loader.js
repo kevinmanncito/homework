@@ -13,10 +13,14 @@ window.addEventListener('load', function() {
   Modernizr.load([
     {
       load : [
-        'preload!js/sizzle.js',
-        'preload!js/dom.js',
+        // Load the vendor js files first
+        'preload!js/vendor/jquery-2.0.3.min.js',
+        'preload!js/vendor/bootstrap.min.js',
+        // 'preload!js/sizzle.js',
+        // 'preload!js/dom.js',
         'preload!js/canvasHelper.js',
         'preload!js/menu.js',
+        'preload!js/score.js',
         'preload!js/Coins.js',
         'preload!js/game.js',
         'preload!assets/Coin-Roman.png',
@@ -37,8 +41,6 @@ window.addEventListener('load', function() {
 // * Tracks how many have been loaded
 // * Places images into the 'images' object
 yepnope.addPrefix('preload', function(resource) {
-  console.log('preloading: ' + resource.url);
-  
   COINGAME.status.preloadRequest += 1;
   var isImage = /.+\.(jpg|png|gif)$/i.test(resource.url);
   resource.noexec = isImage;

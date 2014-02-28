@@ -1,16 +1,24 @@
-COINGAME.initialize = (function initialize(coins, images) {
+COINGAME.initialize = (function initialize(coins, images, menu) {
 
   var coinSystem = undefined;
+  var gameMenu = undefined;
 
   function gameLoop(time) {
+    // If we are currently playing the game lets update the coin system
+    if (coinSystem.getCurrentLevel()) {
+      coinSystem.update();
+    }
     requestAnimationFrame(gameLoop);
   }
 
   return function() {
-
     coinSystem = coins.CoinSystem(images);
-    coinSystem.drawCoin();
+    coinSystem.initializeMouseClickEvents();
+    gameMenu = menu.Menu(coinSystem);
+    gameMenu.initializeMenuEvents();
     requestAnimationFrame(gameLoop);
   };
 
-}(COINGAME.coins, COINGAME.images));
+}(COINGAME.coins,
+  COINGAME.images,
+  COINGAME.menu));

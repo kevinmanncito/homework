@@ -1,0 +1,3 @@
+COINGAME.score = (function() {
+  
+}());

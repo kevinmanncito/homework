@@ -3,14 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <title>AMERICA!</title>
-  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="stylesheet" href="css/flat-ui.css">
+  <link rel="stylesheet" href="css/prettify.css">
   <link rel="stylesheet" href="css/style.css">
-  <script src="js/modernizr.js"></script>
+  <script src="js/vendor/modernizr.js"></script>
   <script src="js/loader.js"></script>
 </head>
 <body>
   <div class="canvas-wrapper">
-    <canvas id="coins-canvas" width="500" height="500" style="width: 100%; height: 100%;"></canvas>
+  
+    <canvas id="coinsCanvas" width="500" height="500" style="width: 100%; height: 100%;"></canvas>
+
+    <div id="menu">
+      <img src="assets/Piggy-Bank.png" alt="Piggy Bank" class="piggy-bank">
+      <div class="score-caption">
+        0
+      </div>
+      <div class="menu-choices">
+        <button id="newGame" class="btn btn-success">New Game</button>
+        <button id="highScores" class="btn btn-success">High Scores</button>
+        <button id="credits" class="btn btn-success">Credits</button>
+      </div>
+    </div>
+    <div class="game-mask">
+      <div class="splash-message">
+        Welcome To Piggy Wiggly!
+        <div class="sub-splash">
+          Choose an option from the menu...
+        </div>
+      </div>
+    </div>
   </div>
 </body>
 </html>
