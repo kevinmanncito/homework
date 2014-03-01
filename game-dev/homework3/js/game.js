@@ -9,6 +9,7 @@ COINGAME.initialize = (function initialize(coins, images, menu, score) {
     // If we are currently playing the game lets update the coin system
     if (coinSystem.getCurrentLevel()) {
       coinSystem.update(time);
+      coinSystem.updateParticles(time);
       scoreKeeper.update(time);
     }
 
