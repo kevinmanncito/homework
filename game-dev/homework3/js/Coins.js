@@ -24,8 +24,8 @@ COINGAME.coins = (function() {
   };
 
   function newHorizontalPosition() {
-    // The range for the coins to drop is 0 - 350 "canvas pixels"
-    return Math.floor((Math.random()*350)+1);
+    // The range for the coins to drop is 0 - 325 "canvas pixels"
+    return Math.floor((Math.random()*325)+1);
   };
 
   function nextGuassian(mean, stdDev) {
@@ -49,7 +49,13 @@ COINGAME.coins = (function() {
   };
 
   function newDropTime() {
-    return nextGuassian(1, .5);
+    var dropTime = nextGuassian(800, 400);
+    return dropTime;
+  };
+
+  function newSpeed() {
+    var speed = nextGuassian(1.5, .5);
+    return speed;
   };
 
   function CoinSystem(images, scoreKeeper) {
@@ -89,15 +95,15 @@ COINGAME.coins = (function() {
       }
       var visibleCoins = false;
       for (var i = 0; i < that.droppingCoins.length; i++) {
-        if (that.droppingCoins[i].verticalPosition < 650) {
+        if (that.droppingCoins[i].verticalPosition < 600 && !that.droppingCoins[i].clicked) {
           visibleCoins = true;
         }
       }
-      if (time - that.nextDropTime > 0) {
-        that.dropCoin();
-      }
       if (!visibleCoins) {
-        that.setCurrentLevel(false);
+        that.currentLevel = false;
+      }
+      if (time - that.nextDropTime > 0 && visibleCoins) {
+        that.dropCoin();
       }
       that.renderCoins();
     };
@@ -122,46 +128,51 @@ COINGAME.coins = (function() {
       // Add a coin to the dropping coins stack
       if (that.coins.levelOne.length !== 0) {
         var posX = newHorizontalPosition();
+        var speed = newSpeed();
         var coinToDrop = that.coins.levelOne.pop();
         if (coinToDrop === 'us') {
           that.droppingCoins.push({
-            speed: 1,
+            speed: speed,
             img: that.images['assets/Coin-US-Dollary.png'],
             horizontalPosition: posX,
             verticalPosition: -50,
             height: 55,
-            width: 60,
-            clicked: false
+            width: 55,
+            clicked: false,
+            value: 10
           });
         } else if (coinToDrop === 'ca') {
           that.droppingCoins.push({
-            speed: 1,
+            speed: speed,
             img: that.images['assets/Coin-Canadian-Dollar.png'],
             horizontalPosition: posX,
             verticalPosition: -50,
-            height: 130,
+            height: 120,
             width: 120,
-            clicked: false
+            clicked: false,
+            value: 0
           });
         } else if (coinToDrop === 'roman') {
           that.droppingCoins.push({
-            speed: 1,
+            speed: speed,
             img: that.images['assets/Coin-Roman.png'],
             horizontalPosition: posX,
             verticalPosition: -50,
-            height: 40,
+            height: 45,
             width: 45,
-            clicked: false
+            clicked: false,
+            value: 50
           });
         } else {
           that.droppingCoins.push({
-            speed: 1,
+            speed: speed,
             img: that.images['assets/Clock.png'],
             horizontalPosition: posX,
             verticalPosition: -50,
             height: 50,
             width: 50,
-            clicked: false
+            clicked: false,
+            value: 'clock'
           });
         }
         var coin = that.droppingCoins[that.droppingCoins.length-1];
@@ -187,21 +198,30 @@ COINGAME.coins = (function() {
         var coords = coinsCanvas.relMouseCoords(e);
         var posX = coords.x;
         var posY = coords.y;
-        for (var i = 0; i < that.droppingCoins.length; i++) {
+        // We want to count from the most recently added coins (back of array)
+        // so that if they are overlapping we get the top one
+        // and only one coin can be clicked at a time
+        var i = that.droppingCoins.length-1;
+        var clicked = false;
+        while (i >= 0 && !clicked) {
           var coin = that.droppingCoins[i];
           if (!coin.clicked) {
-            if (posX >= coin.horizontalPosition && posX <= (coin.horizontalPosition + coin.width)) {
-              if (posY >= coin.verticalPosition && posY <= (coin.verticalPosition + coin.height)) {
+            if (posX > coin.horizontalPosition && posX < (coin.horizontalPosition + coin.height)) {
+              if (posY > coin.verticalPosition && posY < (coin.verticalPosition + coin.width)) {
                 that.droppingCoins[i].clicked = true;
+                clicked = true;
+                scoreKeeper.incrementScore(coin.value);
               }
             }
           }
+          i--;
         }
       });
     };
 
     that.reset = function() {
       coinsContext.clear(coinsCanvas);
+      that.scoreKeeper.setScore(0);
       console.log('reset all coins');
       that.coins = {
         levelOne: [],

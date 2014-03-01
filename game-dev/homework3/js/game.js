@@ -1,25 +1,33 @@
-COINGAME.initialize = (function initialize(coins, images, menu) {
+COINGAME.initialize = (function initialize(coins, images, menu, score) {
 
   var coinSystem = undefined;
   var gameMenu = undefined;
+  var scoreKeeper = undefined;
 
   function gameLoop(time) {
+    
     // If we are currently playing the game lets update the coin system
     if (coinSystem.getCurrentLevel()) {
-      console.log('gameLoop', coinSystem.getCurrentLevel());
       coinSystem.update(time);
+      scoreKeeper.update(time);
     }
+
     requestAnimationFrame(gameLoop);
   }
 
   return function() {
-    coinSystem = coins.CoinSystem(images);
+    scoreKeeper = score.ScoreKeeper();
+    
+    coinSystem = coins.CoinSystem(images, scoreKeeper);
     coinSystem.initializeMouseClickEvents();
-    gameMenu = menu.Menu(coinSystem);
+
+    gameMenu = menu.Menu(coinSystem, scoreKeeper);
     gameMenu.initializeMenuEvents();
+
     requestAnimationFrame(gameLoop);
   };
 
 }(COINGAME.coins,
   COINGAME.images,
-  COINGAME.menu));
+  COINGAME.menu,
+  COINGAME.score));

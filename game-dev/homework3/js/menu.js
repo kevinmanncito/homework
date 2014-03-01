@@ -1,10 +1,12 @@
 COINGAME.menu = (function() {
   'use strict';
 
-  function Menu(coinSystem) {
+  function Menu(coinSystem, scoreKeeper) {
     var that = {};
 
     that.coinSystem = coinSystem;
+
+    that.scoreKeeper = scoreKeeper;
 
     that.newGame = function() {
       // Reset the coin system
