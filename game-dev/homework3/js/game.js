@@ -6,10 +6,10 @@ COINGAME.initialize = (function initialize(coins, images, menu, score) {
 
   function gameLoop(time) {
     
-    // If we are currently playing the game lets update the coin system
+    // If we are currently playing the game (on a level)
+    // lets update the coin system
     if (coinSystem.getCurrentLevel()) {
       coinSystem.update(time);
-      coinSystem.updateParticles(time);
       scoreKeeper.update(time);
     }
 
@@ -20,7 +20,7 @@ COINGAME.initialize = (function initialize(coins, images, menu, score) {
     scoreKeeper = score.ScoreKeeper();
     
     coinSystem = coins.CoinSystem(images, scoreKeeper);
-    coinSystem.initializeMouseClickEvents();
+    coinSystem.initializeCoinClickEvents();
 
     gameMenu = menu.Menu(coinSystem, scoreKeeper);
     gameMenu.initializeMenuEvents();

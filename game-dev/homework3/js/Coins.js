@@ -3,8 +3,6 @@ COINGAME.coins = (function() {
   var coinsCanvas = document.getElementById('coinsCanvas');
   var coinsContext = coinsCanvas.getContext('2d');
 
-  //
-  // This is used to give a small performance optimization in generating gaussian random numbers.
   var y2;
 
   function clear(canvas) {
@@ -42,23 +40,6 @@ COINGAME.coins = (function() {
     y2 = x2 * z;
     
     return mean + y1 * stdDev;
-  };
-
-  function nextDouble() {
-    return Math.random();
-  };
-  
-  function nextRange(min, max) {
-    var range = max - min + 1;
-    return Math.floor((Math.random() * range) + min);
-  };
-  
-  function nextCircleVector() {
-    var angle = Math.random() * 2 * Math.PI;
-    return {
-      x: Math.cos(angle),
-      y: Math.sin(angle)
-    };
   };
 
   function newDropTime() {
@@ -147,7 +128,16 @@ COINGAME.coins = (function() {
       if (that.coins.levelOne.length !== 0) {
         var posX = newHorizontalPosition();
         var speed = newSpeed();
-        var coinToDrop = that.coins.levelOne.pop();
+        var coinToDrop;
+        if (that.currentLevel === 1) {
+          coinToDrop = that.coins.levelOne.pop();
+        }
+        if (that.currentLevel === 2) {
+          coinToDrop = that.coins.levelTwo.pop();
+        }
+        if (that.currentLevel === 3) {
+          coinToDrop = that.coins.levelThree.pop();
+        }
         if (coinToDrop === 'us') {
           that.droppingCoins.push({
             speed: speed,
@@ -198,98 +188,6 @@ COINGAME.coins = (function() {
       }
     };
 
-    that.explode = function(posX, posY) {
-      console.log('created a dollar sign');
-      var p = {
-          image: that.images['assets/Dollar-Sign.png'],
-          size: nextGaussian(10, 4),
-          center: {x: posX, y: posY},
-          direction: nextCircleVector(),
-          speed: nextGaussian(50, 25), // pixels per second
-          rotation: 0,
-          lifetime: nextGaussian(4, 1), // How long the particle should live, in seconds
-          alive: 0  // How long the particle has been alive, in seconds
-        };
-      
-      //
-      // Ensure we have a valid size - gaussian numbers can be negative
-      p.size = Math.max(1, p.size);
-      //
-      // Same thing with lifetime
-      p.lifetime = Math.max(0.01, p.lifetime);
-      //
-      // Assign a unique name to each particle
-      that.particles[that.nextName++] = p;
-    };
-
-    that.updateParticles = function(time) {
-      var removeMe = [];
-      var value;
-      var particle;
-      
-      for (value in that.particles) {
-        if (that.particles.hasOwnProperty(value)) {
-          particle = that.particles[value];
-          //
-          // Update how long it has been alive
-          particle.alive += time;
-          
-          //
-          // Update its position
-          particle.center.x += (time * particle.speed * particle.direction.x);
-          particle.center.y += (time * particle.speed * particle.direction.y);
-          
-          //
-          // Rotate proportional to its speed
-          particle.rotation += particle.speed / 500;
-          
-          //
-          // If the lifetime has expired, identify it for removal
-          if (particle.alive > particle.lifetime) {
-            removeMe.push(value);
-          }
-        }
-      }
-
-      //
-      // Remove all of the expired particles
-      // for (particle = 0; particle < removeMe.length; particle++) {
-      //   delete that.particles[removeMe[particle]];
-      // }
-      // removeMe.length = 0;
-      that.renderParticles();
-    };
-
-    that.renderParticles = function() {
-      var value;
-      var particle;
-      for (value in that.particles) {
-        if (that.particles.hasOwnProperty(value)) {
-          particle = that.particles[value];
-          that.drawParticle(particle);
-        }
-      }
-    };
-
-    that.drawParticle = function(spec) {
-      console.log('particle drawn!');
-      coinsContext.save();
-      coinsContext.beginPath();
-      
-      coinsContext.translate(spec.center.x, spec.center.y);
-      coinsContext.rotate(spec.rotation);
-      coinsContext.translate(-spec.center.x, -spec.center.y);
-      
-      coinsContext.drawImage(
-        spec.image, 
-        spec.center.x - spec.size/2, 
-        spec.center.y - spec.size/2,
-        spec.size, spec.size);
-
-      coinsContext.closePath();
-      coinsContext.restore();
-    };
-
     that.drawCoin = function(coin) {
       coinsContext.save();
       coinsContext.beginPath();
@@ -304,7 +202,13 @@ COINGAME.coins = (function() {
       coinsContext.restore();
     };
 
-    that.initializeMouseClickEvents = function() {
+    that.addBonusCoins = function() {
+      if (that.currentLevel === 1) {
+        
+      }
+    };
+
+    that.initializeCoinClickEvents = function() {
       // Check if a click landed on a dropping coin
       $('#coinsCanvas').click(function(e) {
         var coords = coinsCanvas.relMouseCoords(e);
@@ -323,9 +227,8 @@ COINGAME.coins = (function() {
                 that.droppingCoins[i].clicked = true;
                 clicked = true;
                 scoreKeeper.incrementScore(coin.value);
-                // Create 5 dollar sign particles
-                for (var i = 0; i < 5; i++) {
-                  that.explode(posX, posY);
+                if (coin.value === 'clock') {
+                  that.addBonusCoins();
                 }
               }
             }
