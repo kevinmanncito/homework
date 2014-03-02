@@ -6,12 +6,18 @@ COINGAME.initialize = (function initialize(coins, images, menu, score) {
 
   function gameLoop(time) {
     
+    if (coinSystem.getGameStatus() && !coinSystem.findOutIfCoinsAreFalling()) {
+      coinSystem.prepareForNextLevel();
+      gameMenu.levelTransition();
+    }
+
     // If we are currently playing the game (on a level)
     // lets update the coin system
-    if (coinSystem.getCurrentLevel()) {
+    if (coinSystem.findOutIfCoinsAreFalling()) {
       coinSystem.update(time);
       scoreKeeper.update(time);
     }
+      
 
     requestAnimationFrame(gameLoop);
   }

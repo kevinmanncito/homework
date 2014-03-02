@@ -8,11 +8,45 @@ COINGAME.menu = (function() {
 
     that.scoreKeeper = scoreKeeper;
 
+
+
     that.newGame = function() {
       // Reset the coin system
       coinSystem.reset();
       // Display the countdown then start the game!
       $(".game-mask").show();
+      $("#splashMessage").html("Get Ready!");
+      setTimeout(function (){
+        $("#splashMessage").html("3");
+      }, 1000);
+      setTimeout(function (){
+        $("#splashMessage").html("2");
+      }, 2000);
+      setTimeout(function (){
+        $("#splashMessage").html("1");
+      }, 3000);
+      setTimeout(function (){
+        $("#splashMessage").html("Go!");
+      }, 4000);
+      setTimeout(function (){
+        $(".game-mask").hide();
+        that.coinSystem.startLevel(1);
+      }, 5000);
+    };
+
+    that.levelTransition = function() {
+      $(".game-mask").show();
+      $(".splash-message").html("Level " 
+            + String(that.coinSystem.getCurrentLevel()) 
+            + " Score: " 
+            + String(that.scoreKeeper.getCurrentScore()));
+      $(".continue-wrapper").removeClass('hide');
+    };
+
+    that.continueGame = function() {
+      console.log('continuing game apparently...');
+      $(".game-mask").show();
+      $(".continue-wrapper").addClass('hide');
       $(".splash-message").html("Get Ready!");
       setTimeout(function (){
         $(".splash-message").html("3");
@@ -28,14 +62,19 @@ COINGAME.menu = (function() {
       }, 4000);
       setTimeout(function (){
         $(".game-mask").hide();
-        that.coinSystem.startLevelOne();
+        var nextLevel = that.coinSystem.getNextLevel();
+        that.coinSystem.startLevel(nextLevel);
       }, 5000);
-    }
+    };
 
     that.initializeMenuEvents = function() {
 
       $("#newGame").click(function(e) {
         that.newGame();
+      });
+
+      $("#continue").click(function(e) {
+        that.continueGame();
       });
 
       $("#highScores").click(function(e) {
@@ -47,7 +86,7 @@ COINGAME.menu = (function() {
         $(".game-mask").show();
         $(".splash-message").html("Piggy Wiggly was created by Kevin Mann");
       });
-    }
+    };
 
     return that;
   };

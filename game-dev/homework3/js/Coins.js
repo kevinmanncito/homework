@@ -44,11 +44,17 @@ COINGAME.coins = (function() {
 
   function newDropTime() {
     var dropTime = nextGaussian(800, 400);
+    if (dropTime <= 0) {
+      dropTime = 200;
+    }
     return dropTime;
   };
 
   function newSpeed() {
-    var speed = nextGaussian(1.5, .5);
+    var speed = nextGaussian(1.75, .5);
+    if (speed <= 0) {
+      speed = 0.5;
+    }
     return speed;
   };
 
@@ -61,13 +67,19 @@ COINGAME.coins = (function() {
 
     that.currentLevel = false;
 
+    that.nextLevel = 1;
+
     that.nextDropTime = performance.now();
 
     that.droppingCoins = [];
 
     that.particles = {};
 
-    that.nextName = 1;
+    that.coinsAreFalling = false;
+
+    that.visibleCoins = false;
+
+    that.gameStarted = false;
 
     that.coins = {
       levelOne: [],
@@ -75,12 +87,34 @@ COINGAME.coins = (function() {
       levelThree: []
     };
 
+    that.findOutIfCoinsAreFalling = function() {
+      return that.coinsAreFalling;
+    };
+
+    that.getGameStatus = function() {
+      return that.gameStarted;
+    };
+
     that.getCurrentLevel = function() {
       return that.currentLevel;
     };
 
+    that.getNextLevel = function() {
+      return that.nextLevel;
+    }
+
     that.setCurrentLevel = function(level) {
       that.currentLevel = level;
+    };
+
+    that.setGameStatus = function(status) {
+      that.gameStarted = status;
+    };
+
+    that.prepareForNextLevel = function() {
+      that.coinsAreFalling = true;
+      that.visibleCoins = true;
+      that.droppingCoins = [];
     };
 
     that.update = function(time) {
@@ -91,17 +125,40 @@ COINGAME.coins = (function() {
           that.droppingCoins[i].verticalPosition += that.droppingCoins[i].speed;
         }
       }
-      var visibleCoins = false;
-      for (var i = 0; i < that.droppingCoins.length; i++) {
-        if (that.droppingCoins[i].verticalPosition < 600 && !that.droppingCoins[i].clicked) {
-          visibleCoins = true;
+      // Check what level we are on and if we have coins remaining
+      var coinsRemaining = false;
+      if (that.currentLevel === 1) {
+        if (that.coins.levelOne.length > 0) {
+          coinsRemaining = true;
         }
       }
-      if (!visibleCoins) {
-        that.currentLevel = false;
+      if (that.currentLevel === 2) {
+        if (that.coins.levelTwo.length > 0) {
+          coinsRemaining = true;
+        }
       }
-      if (time - that.nextDropTime > 0 && visibleCoins) {
-        that.dropCoin();
+      if (that.currentLevel === 3) {
+        if (that.coins.levelThree.length > 0) {
+          coinsRemaining = true;
+        }
+      }
+      // Check for visible coins
+      that.visibleCoins = false;
+      for (var i = 0; i < that.droppingCoins.length; i++) {
+        if (that.droppingCoins[i].verticalPosition < 600 && !that.droppingCoins[i].clicked) {
+          that.visibleCoins = true;
+        }
+        // Coins remaining means there will be visible coins
+        if (coinsRemaining) {
+          that.visibleCoins = true;
+          if (time - that.nextDropTime > 0 && that.visibleCoins) {
+            that.dropCoin();
+          }
+        }
+      }
+      if (!that.visibleCoins) {
+        that.coinsAreFalling = false;
+        that.droppingCoins = [];
       }
 
       that.renderCoins();
@@ -116,73 +173,89 @@ COINGAME.coins = (function() {
       }
     };
 
-    that.startLevelOne = function() {
-      console.log('we just started level one!');
-      that.currentLevel = 1;
+    that.startLevel = function(level) {
+      console.log('new level');
+      that.coinsAreFalling = true;
+      that.gameStarted = true;
+      that.currentLevel = level;
+      if (level < 3 && level > 1) {
+        that.nextLevel = level + 1;
+      } else {
+        that.nextLevel = 1;
+      }
       that.dropCoin();
     };
 
     that.dropCoin = function() {
       that.nextDropTime = performance.now() + newDropTime();
       // Add a coin to the dropping coins stack
-      if (that.coins.levelOne.length !== 0) {
-        var posX = newHorizontalPosition();
-        var speed = newSpeed();
-        var coinToDrop;
-        if (that.currentLevel === 1) {
-          coinToDrop = that.coins.levelOne.pop();
+      var posX = newHorizontalPosition();
+      var speed = newSpeed();
+      var coinToDrop;
+      // These if statements check if it is valid to drop a coin
+      if (that.currentLevel === 1) {
+        if (that.coins.levelOne.length === 0) {
+          return;
         }
-        if (that.currentLevel === 2) {
-          coinToDrop = that.coins.levelTwo.pop();
+        coinToDrop = that.coins.levelOne.pop();
+      }
+      if (that.currentLevel === 2) {
+        if (that.coins.levelTwo.length === 0) {
+          return;
         }
-        if (that.currentLevel === 3) {
-          coinToDrop = that.coins.levelThree.pop();
+        coinToDrop = that.coins.levelTwo.pop();
+      }
+      if (that.currentLevel === 3) {
+        if (that.coins.levelThree.length === 0) {
+          return;
         }
-        if (coinToDrop === 'us') {
-          that.droppingCoins.push({
-            speed: speed,
-            img: that.images['assets/Coin-US-Dollary.png'],
-            horizontalPosition: posX,
-            verticalPosition: -50,
-            height: 55,
-            width: 55,
-            clicked: false,
-            value: 10
-          });
-        } else if (coinToDrop === 'ca') {
-          that.droppingCoins.push({
-            speed: speed,
-            img: that.images['assets/Coin-Canadian-Dollar.png'],
-            horizontalPosition: posX,
-            verticalPosition: -50,
-            height: 120,
-            width: 120,
-            clicked: false,
-            value: 0
-          });
-        } else if (coinToDrop === 'roman') {
-          that.droppingCoins.push({
-            speed: speed,
-            img: that.images['assets/Coin-Roman.png'],
-            horizontalPosition: posX,
-            verticalPosition: -50,
-            height: 45,
-            width: 45,
-            clicked: false,
-            value: 50
-          });
-        } else {
-          that.droppingCoins.push({
-            speed: speed,
-            img: that.images['assets/Clock.png'],
-            horizontalPosition: posX,
-            verticalPosition: -50,
-            height: 50,
-            width: 50,
-            clicked: false,
-            value: 'clock'
-          });
-        }
+        coinToDrop = that.coins.levelThree.pop();
+      }
+      if (coinToDrop === 'us') {
+        that.droppingCoins.push({
+          speed: speed,
+          img: that.images['assets/Coin-US-Dollary.png'],
+          horizontalPosition: posX,
+          verticalPosition: -50,
+          height: 55,
+          width: 55,
+          clicked: false,
+          value: 10
+        });
+      } else if (coinToDrop === 'ca') {
+        that.droppingCoins.push({
+          speed: speed,
+          img: that.images['assets/Coin-Canadian-Dollar.png'],
+          horizontalPosition: posX,
+          verticalPosition: -50,
+          height: 120,
+          width: 120,
+          clicked: false,
+          value: 0
+        });
+      } else if (coinToDrop === 'roman') {
+        that.droppingCoins.push({
+          speed: speed,
+          img: that.images['assets/Coin-Roman.png'],
+          horizontalPosition: posX,
+          verticalPosition: -50,
+          height: 45,
+          width: 45,
+          clicked: false,
+          value: 50
+        });
+      } else {
+        that.droppingCoins.push({
+          speed: speed,
+          img: that.images['assets/Clock.png'],
+          horizontalPosition: posX,
+          verticalPosition: -50,
+          height: 50,
+          width: 50,
+          clicked: false,
+          value: 'clock'
+        });
+        
         var coin = that.droppingCoins[that.droppingCoins.length-1];
         that.drawCoin(coin);
       }
@@ -204,7 +277,36 @@ COINGAME.coins = (function() {
 
     that.addBonusCoins = function() {
       if (that.currentLevel === 1) {
-        
+        for (var i = 0; i < 5; i++) {
+          that.coins.levelOne.push('us');
+        }
+        that.coins.levelOne.push('ca');
+        that.coins.levelOne.push('roman');
+        that.coins.levelOne = shuffleCoins(that.coins.levelOne);
+      }
+      if (that.currentLevel === 2) {
+        for (var i = 0; i < 8; i++) {
+          that.coins.levelOne.push('us');
+        }
+        for (var i = 0; i < 3; i++) {
+          that.coins.levelOne.push('ca');
+        }
+        for (var i = 0; i < 2; i++) {
+          that.coins.levelOne.push('roman');
+        }
+        that.coins.levelTwo = shuffleCoins(that.coins.levelTwo);
+      }
+      if (that.currentLevel === 3) {
+        for (var i = 0; i < 12; i++) {
+          that.coins.levelOne.push('us');
+        }
+        for (var i = 0; i < 4; i++) {
+          that.coins.levelOne.push('ca');
+        }
+        for (var i = 0; i < 3; i++) {
+          that.coins.levelOne.push('roman');
+        }
+        that.coins.levelThree = shuffleCoins(that.coins.levelThree);
       }
     };
 
