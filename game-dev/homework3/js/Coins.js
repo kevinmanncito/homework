@@ -43,7 +43,7 @@ COINGAME.coins = (function() {
   };
 
   function newDropTime() {
-    var dropTime = nextGaussian(800, 400);
+    var dropTime = nextGaussian(600, 400);
     if (dropTime <= 0) {
       dropTime = 200;
     }
@@ -51,7 +51,7 @@ COINGAME.coins = (function() {
   };
 
   function newSpeed() {
-    var speed = nextGaussian(1.75, .5);
+    var speed = nextGaussian(2.5, .5);
     if (speed <= 0) {
       speed = 0.5;
     }
@@ -112,7 +112,7 @@ COINGAME.coins = (function() {
     };
 
     that.prepareForNextLevel = function() {
-      that.coinsAreFalling = true;
+      that.gameStarted = false;
       that.visibleCoins = true;
       that.droppingCoins = [];
     };
@@ -148,15 +148,16 @@ COINGAME.coins = (function() {
         if (that.droppingCoins[i].verticalPosition < 600 && !that.droppingCoins[i].clicked) {
           that.visibleCoins = true;
         }
-        // Coins remaining means there will be visible coins
-        if (coinsRemaining) {
-          that.visibleCoins = true;
-          if (time - that.nextDropTime > 0 && that.visibleCoins) {
-            that.dropCoin();
-          }
+      }
+      // Coins remaining means there will be visible coins
+      if (coinsRemaining) {
+        that.visibleCoins = true;
+        if (time - that.nextDropTime > 0) {
+          that.dropCoin();
         }
       }
-      if (!that.visibleCoins) {
+      if (!that.visibleCoins && !coinsRemaining) {
+        console.log('coins are not falling');
         that.coinsAreFalling = false;
         that.droppingCoins = [];
       }
@@ -173,14 +174,13 @@ COINGAME.coins = (function() {
       }
     };
 
-    that.startLevel = function(level) {
-      console.log('new level');
+    that.startLevel = function() {
+      console.log('new level' + String(that.nextLevel));
       that.coinsAreFalling = true;
       that.gameStarted = true;
-      that.currentLevel = level;
-      if (level < 3 && level > 1) {
-        that.nextLevel = level + 1;
-      } else {
+      that.currentLevel = that.nextLevel;
+      that.nextLevel++;
+      if (that.nextLevel > 3) {
         that.nextLevel = 1;
       }
       that.dropCoin();
