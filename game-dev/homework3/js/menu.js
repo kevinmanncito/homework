@@ -57,6 +57,7 @@ COINGAME.menu = (function() {
       setTimeout(function (){
         $("#splashMessage").html("Go!");
         $(".game-mask").hide();
+        that.transitionTime = true;
         that.coinSystem.startLevel();
       }, 1000);
     };

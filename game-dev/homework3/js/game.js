@@ -9,12 +9,9 @@ COINGAME.initialize = (function initialize(coins, images, menu, score) {
     scoreKeeper.update(time);
     gameMenu.update(time);
     
-    console.log(coinSystem.getGameStatus(), coinSystem.findOutIfCoinsAreFalling(), gameMenu.isTransitionTime());
-
     if (coinSystem.getGameStatus() && !coinSystem.findOutIfCoinsAreFalling()) {
       
       if (gameMenu.isTransitionTime()) {
-        console.log('transitioning');
         gameMenu.levelTransition();
         gameMenu.toggleTransitionTime();
         coinSystem.prepareForNextLevel();
