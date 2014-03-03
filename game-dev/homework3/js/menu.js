@@ -27,52 +27,54 @@ COINGAME.menu = (function() {
     };
 
     that.render = function() {
-
+      return;
     };
 
     that.newGame = function() {
       // Reset the coin system
       coinSystem.reset();
       // Display the countdown then start the game!
-      // $(".game-mask").show();
-      // $("#splashMessage").html("Get Ready!");
-      // setTimeout(function (){
-      //   $("#splashMessage").html("3");
-      // }, 1000);
-      // setTimeout(function (){
-      //   $("#splashMessage").html("2");
-      // }, 2000);
-      // setTimeout(function (){
-      //   $("#splashMessage").html("1");
-      // }, 3000);
-      // setTimeout(function (){
-      //   $("#splashMessage").html("Go!");
-      // }, 4000);
-      // setTimeout(function (){
-      //   $(".game-mask").hide();
-      //   that.coinSystem.startLevel(1);
-      // }, 5000);
       $(".game-mask").show();
       $("#splashMessage").html("Get Ready!");
       setTimeout(function (){
+        $("#splashMessage").html("3");
+      }, 1000);
+      setTimeout(function (){
+        $("#splashMessage").html("2");
+      }, 2000);
+      setTimeout(function (){
+        $("#splashMessage").html("1");
+      }, 3000);
+      setTimeout(function (){
         $("#splashMessage").html("Go!");
+      }, 4000);
+      setTimeout(function (){
         $(".game-mask").hide();
         that.transitionTime = true;
-        that.coinSystem.startLevel();
-      }, 1000);
+        that.coinSystem.startLevel(1);
+      }, 5000);
     };
 
     that.levelTransition = function() {
+      that.scoreKeeper.saveLevelScore(that.coinSystem.getCurrentLevel());
+      var level = that.coinSystem.getCurrentLevel();
       $(".game-mask").show();
       $(".splash-message").html("Level " 
-            + String(that.coinSystem.getCurrentLevel()) 
+            + String(level) 
             + " Score: " 
-            + String(that.scoreKeeper.getCurrentScore()));
+            + String(that.scoreKeeper.getCurrentLevelScore(level)));
       $(".continue-wrapper").removeClass('hide');
+      if (level === 3) {
+        $(".splash-message").html(String($(".splash-message").html())
+            + "<br>Overall Score: "
+            + String(that.scoreKeeper.getCurrentScore())
+            + "<div class='sub-splash'></div>");
+        $(".sub-splash").html("Choose an option from the menu...");
+        $(".continue-wrapper").addClass('hide');
+      }
     };
 
     that.continueGame = function() {
-      console.log('continuing game apparently...');
       $(".game-mask").show();
       $(".continue-wrapper").addClass('hide');
       $(".splash-message").html("Get Ready!");
@@ -91,7 +93,6 @@ COINGAME.menu = (function() {
       setTimeout(function (){
         $(".game-mask").hide();
         var nextLevel = that.coinSystem.getNextLevel();
-        console.log(nextLevel);
         that.transitionTime = true;
         that.coinSystem.startLevel(nextLevel);
       }, 5000);
@@ -109,7 +110,14 @@ COINGAME.menu = (function() {
 
       $("#highScores").click(function(e) {
         $(".game-mask").show();
-        $(".splash-message").html("High Scores: ");
+        $(".splash-message").html("High Scores<br><div class='sub-splash'></div>");
+        $(".sub-splash").html(scoreKeeper.getOverallHighScores()
+              + "Level Three<br>" 
+              + scoreKeeper.getLevelThreeHighScores()
+              + "Level Two<br>"
+              + scoreKeeper.getLevelTwoHighScores()
+              + "Level One<br>"
+              + scoreKeeper.getLevelOneHighScores());
       });
 
       $("#credits").click(function(e) {

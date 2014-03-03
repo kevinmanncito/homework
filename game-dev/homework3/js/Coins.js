@@ -157,7 +157,6 @@ COINGAME.coins = (function() {
         }
       }
       if (!that.visibleCoins && !coinsRemaining) {
-        console.log('coins are not falling');
         that.coinsAreFalling = false;
         that.droppingCoins = [];
       }
@@ -175,7 +174,6 @@ COINGAME.coins = (function() {
     };
 
     that.startLevel = function() {
-      console.log('new level' + String(that.nextLevel));
       that.coinsAreFalling = true;
       that.gameStarted = true;
       that.currentLevel = that.nextLevel;
@@ -343,13 +341,19 @@ COINGAME.coins = (function() {
     that.reset = function() {
       coinsContext.clear(coinsCanvas);
       that.scoreKeeper.setScore(0);
-      console.log('reset all coins');
       that.coins = {
         levelOne: [],
         levelTwo: [],
         levelThree: []
       }
+      that.currentLevel = false;
+      that.nextLevel = 1;
+      that.nextDropTime = performance.now();
       that.droppingCoins = [];
+      that.particles = {};
+      that.coinsAreFalling = false;
+      that.visibleCoins = false;
+      that.gameStarted = false;
       // Initialize the level one coins
       for (var i = 0; i < 10; i++) {
         that.coins.levelOne.push('us');
@@ -395,7 +399,6 @@ COINGAME.coins = (function() {
       // Insert the clock into the middle
       var middle = Math.floor(that.coins.levelThree.length/2);
       that.coins.levelThree.splice(that.coins.levelThree.length/2, 0, 'clock');
-      console.log(that.coins);
     };
 
     return that;
