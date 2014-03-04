@@ -20,7 +20,7 @@ COINGAME.coins = (function() {
 
   function newHorizontalPosition() {
     // The range for the coins to drop is 0 - 325 "canvas pixels"
-    return Math.floor((Math.random()*325)+1);
+    return Math.floor((Math.random()*300)+1);
   };
 
   function nextGaussian(mean, stdDev) {
@@ -226,8 +226,8 @@ COINGAME.coins = (function() {
           img: that.images['assets/Coin-Canadian-Dollar.png'],
           horizontalPosition: posX,
           verticalPosition: -50,
-          height: 120,
-          width: 120,
+          height: 115,
+          width: 115,
           clicked: false,
           value: 0
         });
