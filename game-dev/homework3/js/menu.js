@@ -98,6 +98,7 @@ COINGAME.menu = (function() {
         $(".game-mask").hide();
         var nextLevel = that.coinSystem.getNextLevel();
         that.transitionTime = true;
+        that.scoreKeeper.resetCanadaFlag();
         that.coinSystem.startLevel(nextLevel);
       }, 5000);
     };

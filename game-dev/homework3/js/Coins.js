@@ -262,6 +262,7 @@ COINGAME.coins = (function() {
     that.drawCoin = function(coin) {
       coinsContext.save();
       coinsContext.beginPath();
+
       coinsContext.drawImage(
         coin.img,
         coin.horizontalPosition,
@@ -284,25 +285,25 @@ COINGAME.coins = (function() {
       }
       if (that.currentLevel === 2) {
         for (var i = 0; i < 8; i++) {
-          that.coins.levelOne.push('us');
+          that.coins.levelTwo.push('us');
         }
         for (var i = 0; i < 3; i++) {
-          that.coins.levelOne.push('ca');
+          that.coins.levelTwo.push('ca');
         }
         for (var i = 0; i < 2; i++) {
-          that.coins.levelOne.push('roman');
+          that.coins.levelTwo.push('roman');
         }
         that.coins.levelTwo = shuffleCoins(that.coins.levelTwo);
       }
       if (that.currentLevel === 3) {
         for (var i = 0; i < 12; i++) {
-          that.coins.levelOne.push('us');
+          that.coins.levelThree.push('us');
         }
         for (var i = 0; i < 4; i++) {
-          that.coins.levelOne.push('ca');
+          that.coins.levelThree.push('ca');
         }
         for (var i = 0; i < 3; i++) {
-          that.coins.levelOne.push('roman');
+          that.coins.levelThree.push('roman');
         }
         that.coins.levelThree = shuffleCoins(that.coins.levelThree);
       }

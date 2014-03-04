@@ -12,34 +12,36 @@ COINGAME.score = (function() {
 
     that.levelThreeScore = 0;
 
+    that.hitCanada = false;
+
     that.incrementScore = function(amount) {
       if (amount === 0) {
         that.currentScore = 0;
+        that.hitCanada = true;
       } 
       if (amount !== 0 && amount !== 'clock') {
         that.currentScore = that.currentScore + amount;
       }
     };
 
+    that.resetCanadaFlag = function() {
+      that.hitCanada = false;
+    };
+
     that.saveLevelScore = function(level) {
-      var potentialScore;
       if (level === 1) {
         that.levelOneScore = that.currentScore;
       }
       if (level === 2) {
-        potentialScore = that.currentScore - that.levelOneScore;
-        if (potentialScore < 0) {
+        that.levelTwoScore = that.currentScore - that.levelOneScore;
+        if (that.hitCanada) {
           that.levelTwoScore = that.currentScore;
-        } else {
-          that.levelTwoScore = potentialScore;
         }
       }
       if (level === 3) {
-        potentialScore = that.currentScore - (that.levelOneScore + that.levelTwoScore);
-        if (potentialScore < 0) {
+        that.levelThreeScore = that.currentScore - (that.levelOneScore + that.levelTwoScore);
+        if (that.hitCanada) {
           that.levelThreeScore = that.currentScore;
-        } else {
-          that.levelThreeScore = potentialScore;
         }
       }
       var value;
