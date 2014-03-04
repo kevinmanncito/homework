@@ -1,3 +1,10 @@
+img {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
 .canvas-wrapper {
   margin-top: 25px;
   margin-left: -400px;
@@ -13,13 +20,19 @@
   background-position: center center;
   border: solid 3px whitesmoke;
 }
-#canvas {
+#coinsCanvas {
+  z-index: 10;
+  position: relative;
+  top: 0;
+  left: 0;
+  display: block;
+}
+#particlesCanvas {
+  z-index: 9;
   position: absolute;
   top: 0;
-  right: 0;
-  outline: solid 1px black;
+  left: 0;
   display: block;
-  z-index: 50;
 }
 #menu {
   position: absolute;
@@ -27,7 +40,11 @@
   right: 0;
   width: 150px;
   height: 100%;
+  z-index: 100;
   display: block;
+}
+.continue-wrapper {
+  z-index: 100;
 }
 .piggy-bank {
   position: absolute;

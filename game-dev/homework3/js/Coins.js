@@ -58,7 +58,7 @@ COINGAME.coins = (function() {
     return speed;
   };
 
-  function CoinSystem(images, scoreKeeper) {
+  function CoinSystem(images, scoreKeeper, particleSystem) {
     var that = {};
 
     that.images = images;
@@ -73,7 +73,7 @@ COINGAME.coins = (function() {
 
     that.droppingCoins = [];
 
-    that.particles = {};
+    that.particleSystem = particleSystem;
 
     that.coinsAreFalling = false;
 
@@ -326,6 +326,7 @@ COINGAME.coins = (function() {
               if (posY > coin.verticalPosition && posY < (coin.verticalPosition + coin.width)) {
                 that.droppingCoins[i].clicked = true;
                 clicked = true;
+                particleSystem.coinClicked(coords);
                 scoreKeeper.incrementScore(coin.value);
                 if (coin.value === 'clock') {
                   that.addBonusCoins();

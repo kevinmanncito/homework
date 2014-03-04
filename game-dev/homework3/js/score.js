@@ -127,67 +127,111 @@ COINGAME.score = (function() {
     };
 
     that.getOverallHighScores = function() {
-      var highScoreString = "";
-      var highScoreArray = JSON.parse(localStorage['overall']);
-      highScoreArray.sort(function(a,b){return b-a});
-      if (highScoreArray.length >= 3) {
-        for (var i = 0; i < 3; i++) {
-          highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
-        }
-      } else {
-        for (var i = 0; i < highScoreArray.length; i++) {
-          highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+      // Check if local storage has key:
+      var hasKey = false;
+      for (var value in localStorage) {
+        if (String(value) === 'overall') {
+          hasKey = true;
         }
       }
-      return highScoreString;
+      if (hasKey) {
+        var highScoreString = "";
+        var highScoreArray = JSON.parse(localStorage['overall']);
+        highScoreArray.sort(function(a,b){return b-a});
+        if (highScoreArray.length >= 3) {
+          for (var i = 0; i < 3; i++) {
+            highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+          }
+        } else {
+          for (var i = 0; i < highScoreArray.length; i++) {
+            highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+          }
+        }
+        return highScoreString;
+      } else {
+        return "";
+      }
     };
 
     that.getLevelThreeHighScores = function() {
-      var highScoreString = "";
-      var highScoreArray = JSON.parse(localStorage[3]);
-      highScoreArray.sort(function(a,b){return b-a});
-      if (highScoreArray.length >= 3) {
-        for (var i = 0; i < 3; i++) {
-          highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
-        }
-      } else {
-        for (var i = 0; i < highScoreArray.length; i++) {
-          highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+      // Check if local storage has key:
+      var hasKey = false;
+      for (var value in localStorage) {
+        if (String(value) === '3') {
+          hasKey = true;
         }
       }
-      return highScoreString;
+      if (hasKey) {
+        var highScoreString = "";
+        var highScoreArray = JSON.parse(localStorage[3]);
+        highScoreArray.sort(function(a,b){return b-a});
+        if (highScoreArray.length >= 3) {
+          for (var i = 0; i < 3; i++) {
+            highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+          }
+        } else {
+          for (var i = 0; i < highScoreArray.length; i++) {
+            highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+          }
+        }
+        return highScoreString;
+      } else {
+        return "";
+      }
     };
 
     that.getLevelTwoHighScores = function() {
-      var highScoreString = "";
-      var highScoreArray = JSON.parse(localStorage[2]);
-      highScoreArray.sort(function(a,b){return b-a});
-      if (highScoreArray.length >= 3) {
-        for (var i = 0; i < 3; i++) {
-          highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
-        }
-      } else {
-        for (var i = 0; i < highScoreArray.length; i++) {
-          highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+      // Check if local storage has key:
+      var hasKey = false;
+      for (var value in localStorage) {
+        if (String(value) === '2') {
+          hasKey = true;
         }
       }
-      return highScoreString;
+      if (hasKey) {
+        var highScoreString = "";
+        var highScoreArray = JSON.parse(localStorage[2]);
+        highScoreArray.sort(function(a,b){return b-a});
+        if (highScoreArray.length >= 3) {
+          for (var i = 0; i < 3; i++) {
+            highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+          }
+        } else {
+          for (var i = 0; i < highScoreArray.length; i++) {
+            highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+          }
+        }
+        return highScoreString;
+      } else {
+        return "";
+      }
     };
 
     that.getLevelOneHighScores = function() {
-      var highScoreString = "";
-      var highScoreArray = JSON.parse(localStorage[1]);
-      highScoreArray.sort(function(a,b){return b-a});
-      if (highScoreArray.length >= 3) {
-        for (var i = 0; i < 3; i++) {
-          highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
-        }
-      } else {
-        for (var i = 0; i < highScoreArray.length; i++) {
-          highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+      // Check if local storage has key:
+      var hasKey = false;
+      for (var value in localStorage) {
+        if (String(value) === '2') {
+          hasKey = true;
         }
       }
-      return highScoreString;
+      if (hasKey) {
+        var highScoreString = "";
+        var highScoreArray = JSON.parse(localStorage[1]);
+        highScoreArray.sort(function(a,b){return b-a});
+        if (highScoreArray.length >= 3) {
+          for (var i = 0; i < 3; i++) {
+            highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+          }
+        } else {
+          for (var i = 0; i < highScoreArray.length; i++) {
+            highScoreString = highScoreString + String(highScoreArray[i]) + "<br>";
+          }
+        }
+        return highScoreString;
+      } else {
+        return "";
+      }
     };
 
     return that;

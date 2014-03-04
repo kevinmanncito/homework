@@ -18,6 +18,8 @@ window.addEventListener('load', function() {
         'preload!js/vendor/bootstrap.min.js',
         // 'preload!js/sizzle.js',
         // 'preload!js/dom.js',
+        'preload!js/random.js',
+        'preload!js/Particles.js',
         'preload!js/canvasHelper.js',
         'preload!js/menu.js',
         'preload!js/score.js',

@@ -63,7 +63,11 @@ COINGAME.menu = (function() {
             + String(level) 
             + " Score: " 
             + String(that.scoreKeeper.getCurrentLevelScore(level)));
-      $(".continue-wrapper").removeClass('hide');
+      if (that.scoreKeeper.getCurrentLevelScore(level) < 100) {
+        $(".continue-wrapper").addClass('hide');
+      } else {
+        $(".continue-wrapper").removeClass('hide');
+      }
       if (level === 3) {
         $(".splash-message").html(String($(".splash-message").html())
             + "<br>Overall Score: "
@@ -109,20 +113,24 @@ COINGAME.menu = (function() {
       });
 
       $("#highScores").click(function(e) {
-        $(".game-mask").show();
-        $(".splash-message").html("High Scores<br><div class='sub-splash'></div>");
-        $(".sub-splash").html(scoreKeeper.getOverallHighScores()
-              + "Level Three<br>" 
-              + scoreKeeper.getLevelThreeHighScores()
-              + "Level Two<br>"
-              + scoreKeeper.getLevelTwoHighScores()
-              + "Level One<br>"
-              + scoreKeeper.getLevelOneHighScores());
+        if (!coinSystem.getGameStatus()) {
+          $(".game-mask").show();
+          $(".splash-message").html("High Scores<br><div class='sub-splash'></div>");
+          $(".sub-splash").html(scoreKeeper.getOverallHighScores()
+                + "Level Three<br>" 
+                + scoreKeeper.getLevelThreeHighScores()
+                + "Level Two<br>"
+                + scoreKeeper.getLevelTwoHighScores()
+                + "Level One<br>"
+                + scoreKeeper.getLevelOneHighScores());
+        }
       });
 
       $("#credits").click(function(e) {
-        $(".game-mask").show();
-        $(".splash-message").html("Piggy Wiggly was created by Kevin Mann");
+        if (!coinSystem.getGameStatus()) {
+          $(".game-mask").show();
+          $(".splash-message").html("Piggy Wiggly was created by Kevin Mann");
+        }
       });
     };
 
