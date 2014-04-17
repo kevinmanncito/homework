@@ -1,0 +1,41 @@
+* {
+	padding: 0;
+	margin: 0;
+}
+
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+input {
+  width: 200px !important;
+  margin-bottom: 10px;
+}
+
+.message {
+
+}
+
+.navbar { 
+    border-radius:0;
+    margin-bottom: 0;
+}
+
+.jumbotron {
+  height: 250px;
+  border-top-right-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+}
+
+.canvas-wrapper {
+  margin-top: 10px;
+}
+
+#canvas {
+  background-color: blue;
+  border: 2px solid black;
+}

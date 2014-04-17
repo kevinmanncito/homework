@@ -1,0 +1,14 @@
+<div>
+  <div>
+    <h1>{{title}}</h1>
+    <input type="text" class="form-control" ng-model="game.player" placeholder="Enter name">
+    <button class="btn btn-default" ng-click="start(true)" ng-hide="hideStart">Start</button>
+    <button class="btn btn-default" ng-click="restart()" ng-hide="hideReset">Reset</button>
+  </div>
+
+  <div class="canvas-wrapper">
+    <canvas id="canvas" height="75" width="400">Canvas is not supported</canvas>
+  </div>
+
+  <div class="message" ng-model="message" ng-hide="hideMessage">{{message}}</div>
+</div>
