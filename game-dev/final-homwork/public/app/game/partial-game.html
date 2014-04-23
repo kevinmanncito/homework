@@ -1,3 +1,11 @@
-<h1>{{title}}</h1>
+<h1>{{message}}</h1>
 
-<canvas id="canvas" height="600" width="960">Canvas is not supported</canvas>
+<div class="row">
+  <div class="col-md-12">
+    <input type="text" class="form-control" placeholder="Player Name" ng-model="game.player" ng-hide="hideInput">
+    <button class="btn btn-default" ng-click="start()" ng-hide="hideInput">Start</button>
+  </div>
+  <div class="col-md-12">
+    <canvas id="canvas" height="625" width="800" ng-click="diffuseBomb($event)">Canvas is not supported</canvas>
+  </div>
+</div>

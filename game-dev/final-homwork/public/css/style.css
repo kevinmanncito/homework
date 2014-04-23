@@ -48,43 +48,14 @@ a {
 }
 
 #canvas {
-	position: absolute;
-	margin-top: 40px;
-  margin-bottom: 40px;
-	border: 1px solid #000;
+  border: 1px solid #000;
+  background: url('../img/Background.png') no-repeat;
+  background-size: 100%;
 }
-
-#background {
-	position: absolute;
-	margin-top: 40px;
-	border: 1px solid #000;
-	background-color: #000;
-	z-index: -1;
-  background-image: url('/img/deep-space-green.jpg');
+button {
+  margin-bottom: 10px !important;
 }
-
-#score {
-  position: absolute;
-  top: 17px;
-  right: 10%;
-  color: white;
-}
-
-#lives {
-  position: absolute;
-  top: 17px;
-  right: 20%;
-  color: white;
-}
-
-.score {
-  position: absolute;
-  top: 0;
-  right: 0;
-  color: white;
-  z-index: 100;
-}
-
-.form input {
+input {
   margin-bottom: 10px;
+  width: 200px !important;
 }
