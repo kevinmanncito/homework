@@ -24,9 +24,9 @@ HTMLCanvasElement.prototype.relMouseCoords = function(event) {
   // I divide the x pixel location by 1.6 and the y pixel
   // location by 1.2 to convert to the rectangular "canvas" pixels
   // because the canvas is styled width: 800px and height: 600px
-  // if (event.offsetX !== undefined && event.offsetY !== undefined) { 
-  //   return {x:event.offsetX/1.6, y:event.offsetY/1.2};
-  // }
+  if (event.offsetX !== undefined && event.offsetY !== undefined) { 
+    return {x:event.offsetX, y:event.offsetY};
+  }
 
   // This is the method from the stack overflow question
   // not as good as the code above

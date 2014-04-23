@@ -4,16 +4,15 @@ angular.module('game')
 
     var nextName = 1;
 
-    function create(spec, center, particles, rot) {
+    function create(image, center, particles) {
       var p = {
-          image: spec.image,
-          size: Calc.nextGaussian(10, 4),
+          image: image,
+          size: Calc.nextGaussian(20, 4),
           center: {x: center.x, y: center.y},
-          direction: Calc.thrustCircleVector(rot),
-          speed: Calc.nextGaussian(spec.speed.mean, spec.speed.stdev), // pixels per second
+          direction: Calc.nextCircleVector(),
+          speed: Calc.nextGaussian(50, 25), // pixels per second
           rotation: 0,
-          shipsRot: rot,
-          lifetime: Calc.nextGaussian(spec.lifetime.mean, spec.lifetime.stdev), // How long the particle should live, in seconds
+          lifetime: Calc.nextGaussian(2.5, 1), // How long the particle should live, in seconds
           alive: 0  // How long the particle has been alive, in seconds
         };
 
@@ -48,7 +47,7 @@ angular.module('game')
           
           //
           // Rotate proportional to its speed
-          // particle.rotation += particle.speed / 500;
+          particle.rotation += particle.speed / 500;
           
           //
           // If the lifetime has expired, identify it for removal

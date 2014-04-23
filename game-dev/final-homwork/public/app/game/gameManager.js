@@ -42,17 +42,26 @@ angular.module('game')
 
       var nine = new Image();
       nine.src = '../img/glass_numbers_9.png';
+
+      var smoke = new Image();
+      smoke.src = '../img/smoke.png';
+
+      var fire = new Image();
+      fire.src = '../img/fire.png';
       
       // Returning the game object
       return {
         player: '',
         level: 1,
-        score: 0,
+        totalScore: 0,
+        levelScore: 0,
         totalTime: 0,
         levelTime: 0,
         secondTimer: 0,
         scoreSaved: false,
         status: false,
+        continueToNextLevel: true,
+        updateAngular: false,
         particles: [],
         bombs: [],
         bombImgs: {
@@ -68,8 +77,11 @@ angular.module('game')
           six: six,
           seven: seven,
           eight: eight,
-          nine: nine
-        } 
+          nine: nine,
+          smoke: smoke,
+          fire: fire
+        },
+        prevSound: 0
       }
     }
 
@@ -108,15 +120,15 @@ angular.module('game')
     }
 
     function getBombLocationFromIndex(index) {
-      var col1 = 200,
-          col2 = 300,
-          col3 = 400,
-          row1 = 100,
-          row2 = 200,
-          row3 = 300,
-          row4 = 400,
-          row5 = 500,
-          row6 = 600;
+      var col1 = 250,
+          col2 = 350,
+          col3 = 450,
+          row1 = 50,
+          row2 = 150,
+          row3 = 250,
+          row4 = 350,
+          row5 = 450,
+          row6 = 550;
 
       // Row one
       if (index === 0) {
@@ -240,39 +252,87 @@ angular.module('game')
     }
 
     function getBombImgFromValue(value, imgs) {
-      if (value === 0)
+      if (value === 0) {
         return imgs.zero;
-      if (value === 1)
+      }
+      if (value === 1) {
         return imgs.one;
-      if (value === 2)
+      }
+      if (value === 2) {
         return imgs.two;
-      if (value === 3)
+      }
+      if (value === 3) {
         return imgs.three;
-      if (value === 4)
+      }
+      if (value === 4) {
         return imgs.four;
-      if (value === 5)
+      }
+      if (value === 5) {
         return imgs.five;
-      if (value === 6)
+      }
+      if (value === 6) {
         return imgs.six;
-      if (value === 7)
+      }
+      if (value === 7) {
         return imgs.seven;
-      if (value === 8)
+      }
+      if (value === 8) {
         return imgs.eight;
-      if (value === 9)
+      }
+      if (value === 9) {
         return imgs.nine;
-      if (value === -1)
+      }
+      if (value === -1) {
         return imgs.bomb;
-      if (value === -2)
+      }
+      if (value === -2) {
         return imgs.explode;
-      if (value === -3)
+      }
+      if (value === -3) {
         return imgs.check;
+      }
+    }
+
+    function checkForBombClick(index, coords) {
+      var location = getBombLocationFromIndex(index);
+      if (coords.x > location.x + 10 && coords.x < location.x + 100) {
+        if (coords.y > location.y + 10 && coords.y < location.y + 98) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function saveLevelScore(score, level, player) {
+      var value,
+          scores,
+          hasScore = false;
+      for (value in localStorage) {
+        if (String(value) === String(level)) {
+          hasScore = true;
+        }
+      }
+      if (hasScore) {
+        scores = JSON.parse(localStorage[String(value)]);
+        console.log(scores);
+        scores.push(score);
+        localStorage[String(value)] = JSON.stringify(scores);
+      } else {
+        scores = [{player:score}];
+        
+        localStorage[score] = JSON.stringify(scores);
+      }
+
+      console.log(localStorage);
     }
 
     return {
       newGame : newGame,
       getBombs : getBombs,
       getBombLocationFromIndex : getBombLocationFromIndex,
-      getBombImgFromValue : getBombImgFromValue
+      getBombImgFromValue : getBombImgFromValue,
+      checkForBombClick : checkForBombClick,
+      saveLevelScore : saveLevelScore
     }
 
   }]);
