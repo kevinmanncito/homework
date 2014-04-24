@@ -1,1 +1,115 @@
 <h1>{{title}}</h1>
+
+<div class="row">
+  <div class="col-md-6">
+    <h3>Overall Scores:</h3>
+    <ol>
+      <li ng-repeat="score in scores.overallScores | orderBy:'-score' | limitTo:5">
+        {{score.name}} - {{score.score}}
+      </li>
+    </ol>
+  </div>
+  <div class="col-md-6">
+    <h3>Overall Times:</h3>
+    <ol>
+      <li ng-repeat="time in scores.overallTimes | orderBy:'time' | limitTo:5">
+        {{time.name}} - {{time.time|number:2}}
+      </li>
+    </ol>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <h3>Level 1 Scores:</h3>
+    <ol>
+      <li ng-repeat="score in scores.level1Scores | orderBy:'-score' | limitTo:5">
+        {{score.name}} - {{score.score}}
+      </li>
+    </ol>
+  </div>
+  <div class="col-md-6">
+    <h3>Level 1 Times:</h3>
+    <ol>
+      <li ng-repeat="time in scores.level1Times | orderBy:'time' | limitTo:5">
+        {{time.name}} - {{time.time|number:2}}
+      </li>
+    </ol>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <h3>Level 2 Scores:</h3>
+    <ol>
+      <li ng-repeat="score in scores.level2Scores | orderBy:'-score' | limitTo:5">
+        {{score.name}} - {{score.score}}
+      </li>
+    </ol>
+  </div>
+  <div class="col-md-6">
+    <h3>Level 2 Times:</h3>
+    <ol>
+      <li ng-repeat="time in scores.level2Times | orderBy:'time' | limitTo:5">
+        {{time.name}} - {{time.time|number:2}}
+      </li>
+    </ol>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <h3>Level 3 Scores:</h3>
+    <ol>
+      <li ng-repeat="score in scores.level3Scores | orderBy:'-score' | limitTo:5">
+        {{score.name}} - {{score.score}}
+      </li>
+    </ol>
+  </div>
+  <div class="col-md-6">
+    <h3>Level 3 Times:</h3>
+    <ol>
+      <li ng-repeat="time in scores.level3Times | orderBy:'time' | limitTo:5">
+        {{time.name}} - {{time.time|number:2}}
+      </li>
+    </ol>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <h3>Level 4 Scores:</h3>
+    <ol>
+      <li ng-repeat="score in scores.level4Scores | orderBy:'-score' | limitTo:5">
+        {{score.name}} - {{score.score}}
+      </li>
+    </ol>
+  </div>
+  <div class="col-md-6">
+    <h3>Level 4 Times:</h3>
+    <ol>
+      <li ng-repeat="time in scores.level4Times | orderBy:'time' | limitTo:5">
+        {{time.name}} - {{time.time|number:2}}
+      </li>
+    </ol>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <h3>Level 5 Scores:</h3>
+    <ol>
+      <li ng-repeat="score in scores.level5Scores | orderBy:'-score' | limitTo:5">
+        {{score.name}} - {{score.score}}
+      </li>
+    </ol>
+  </div>
+  <div class="col-md-6">
+    <h3>Level 5 Times:</h3>
+    <ol>
+      <li ng-repeat="time in scores.level5Times | orderBy:'time' | limitTo:5">
+        {{time.name}} - {{time.time|number:2}}
+      </li>
+    </ol>
+  </div>
+</div>

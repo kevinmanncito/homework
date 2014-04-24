@@ -10,6 +10,8 @@ angular.module('game')
     
     $scope.scores = Scores.get();
 
+    console.log($scope.scores);
+
     $scope.title = 'High Scores';
 
   }]);
