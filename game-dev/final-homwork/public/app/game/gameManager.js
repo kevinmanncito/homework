@@ -120,9 +120,9 @@ angular.module('game')
     }
 
     function getBombLocationFromIndex(index) {
-      var col1 = 250,
-          col2 = 350,
-          col3 = 450,
+      var col1 = 300,
+          col2 = 400,
+          col3 = 500,
           row1 = 50,
           row2 = 150,
           row3 = 250,
@@ -305,25 +305,127 @@ angular.module('game')
 
     function saveLevelScore(score, level, player) {
       var value,
-          scores,
+          scores = [],
           hasScore = false;
       for (value in localStorage) {
-        if (String(value) === String(level)) {
+        if (String(value) === 'score'+String(level)) {
+          hasScore = true;
+        }
+      }
+      if (hasScore) { // Score for this level has already been added
+        scores = JSON.parse(localStorage['score'+String(level)]);
+        hasScore = false;
+        scores.forEach(function (s, index) {
+          if (s.name === player) {
+            hasScore = true;
+            if (score > s.score) {
+              scores[index].score = score;
+            }
+          }
+        });
+        if (!hasScore) {
+          scores.push({score:score,
+                       name:player});
+        }
+        
+      } else { // First time a score for this level has been added
+        scores.push({score:score,
+                     name:player});
+      }
+      console.log(localStorage);
+      localStorage['score'+String(level)] = JSON.stringify(scores);
+    }
+
+    function saveOverallScore(score, player) {
+      var value,
+          scores = [],
+          hasScore = false;
+      for (value in localStorage) {
+        if (String(value) === 'overallScore') {
           hasScore = true;
         }
       }
       if (hasScore) {
-        scores = JSON.parse(localStorage[String(value)]);
-        console.log(scores);
-        scores.push(score);
-        localStorage[String(value)] = JSON.stringify(scores);
+        scores = JSON.parse(localStorage['overallScore']);
+        hasScore = false;
+        scores.forEach(function (s, index) {
+          if (s.name === player) {
+            hasScore = true;
+            if (score > s.score) {
+              scores[index].score = s.score;
+            }
+          }
+          if (!hasScore) {
+            scores.push({score:score, name:player});
+          }
+        });
       } else {
-        scores = [{player:score}];
-        
-        localStorage[score] = JSON.stringify(scores);
+        scores.push({name:player,
+                     score:score});
       }
+      localStorage['overallScore'] = JSON.stringify(scores);
+    }
 
-      console.log(localStorage);
+    function saveLevelTime(time, level, player) {
+      var value,
+          times = [],
+          hasTime = false;
+      for (value in localStorage) {
+        if (String(value) === 'time'+String(level)) {
+          hasTime = true;
+        }
+      }
+      if (hasTime) { // Score for this level has already been added
+        times = JSON.parse(localStorage['time'+String(level)]);
+        hasTime = false;
+        times.forEach(function (t, index) {
+          if (t.name === player) {
+            hasTime = true;
+            if (time < t.time) {
+              times[index].time = time;
+            }
+          }
+        });
+        if (!hasTime) {
+          times.push({time:time,
+                       name:player});
+        }
+        
+      } else { // First time a score for this level has been added
+        times.push({time:time,
+                    name:player});
+      }
+      localStorage['time'+String(level)] = JSON.stringify(times);
+    }
+
+    function saveOverallTime(time, player) {
+      var value,
+          times = [],
+          hasTime = false;
+      for (value in localStorage) {
+        if (String(value) === 'overallTime') {
+          hasTime = true;
+        }
+      }
+      if (hasTime) {
+        times = JSON.parse(localStorage['overallTime']);
+        hasTime = false;
+        times.forEach(function (t, index) {
+          if (t.name === player) {
+            hasTime = true;
+            if (time > t.time) {
+              times[index].time = t.time;
+            }
+          }
+          if (!hasTime) {
+            times.push({time:time, name:player});
+          }
+        });
+      } else {
+        times.push({name:player,
+                    time:time});
+      }
+      localStorage['overallTime'] = JSON.stringify(times);
     }
 
     return {
@@ -332,7 +434,10 @@ angular.module('game')
       getBombLocationFromIndex : getBombLocationFromIndex,
       getBombImgFromValue : getBombImgFromValue,
       checkForBombClick : checkForBombClick,
-      saveLevelScore : saveLevelScore
+      saveLevelScore : saveLevelScore,
+      saveOverallScore : saveOverallScore,
+      saveLevelTime : saveLevelTime,
+      saveOverallTime : saveOverallTime
     }
 
   }]);

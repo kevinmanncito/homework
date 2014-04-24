@@ -18,6 +18,7 @@ angular.module('game')
     // CANVAS ELEMENTS
     $scope.canvas = document.getElementById('canvas');
     $scope.context = $scope.canvas.getContext('2d');
+    $scope.player = '';
 
     $scope.message = 'Enter your name and click start!';
     $scope.hideInput = false;
@@ -30,8 +31,10 @@ angular.module('game')
       $scope.game = GameManager.newGame();
       $scope.game.bombs = GameManager.getBombs($scope.game.level);
 
-      if ($scope.game.player === '') {
+      if ($scope.player === '') {
         $scope.game.player = 'Guest';
+      } else {
+        $scope.game.player = $scope.player;
       }
       $scope.hideInput = true;
       $scope.message = "Score: " + $scope.game.levelScore + " Level: " + $scope.game.level;

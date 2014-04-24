@@ -40,22 +40,23 @@ angular.module('game')
       if (elapsedTime > 1) {
         elapsedTime = 0.03;
       }
-      $scope.game.totalTime += elapsedTime;
       $scope.game.levelTime += elapsedTime;
       $scope.game.secondTimer += elapsedTime;
     }
 
     function updateClick($scope, coords) {
-      $scope.game.bombs.forEach(function (bomb, index) {
-        if (GameManager.checkForBombClick(index, coords)) {
-          if (bomb !== -1 && bomb !== -2 && bomb !== -3) {
-            $scope.game.bombs[index] = -3;
-            $scope.game.levelScore += bomb;
-            $scope.game.updateAngular = true;
-            $scope.message = "Score: " + $scope.game.levelScore + " Level: " + $scope.game.level;
+      if ($scope.game !== undefined) {
+        $scope.game.bombs.forEach(function (bomb, index) {
+          if (GameManager.checkForBombClick(index, coords)) {
+            if (bomb !== -1 && bomb !== -2 && bomb !== -3) {
+              $scope.game.bombs[index] = -3;
+              $scope.game.levelScore += bomb;
+              $scope.game.updateAngular = true;
+              $scope.message = "Score: " + $scope.game.levelScore + " Level: " + $scope.game.level;
+            }
           }
-        }
-      });
+        });
+      }
     }
 
     function updateLevel($scope) {
@@ -70,6 +71,9 @@ angular.module('game')
         GameManager.saveLevelScore($scope.game.levelScore, 
                                    $scope.game.level,
                                    $scope.game.player);
+        GameManager.saveLevelTime($scope.game.levelTime,
+                                  $scope.game.level,
+                                  $scope.game.player);
         $scope.game.status = false;
         // Check if any bombs exploded
         $scope.game.bombs.forEach(function (bomb, index) {
@@ -87,11 +91,16 @@ angular.module('game')
             $scope.message = "You have completed the game with a score of " + $scope.game.totalScore + "! Click start to play again.";
             $scope.hideInput = false;
             $scope.hideContinue = true;
+            GameManager.saveOverallScore($scope.game.totalScore, $scope.game.player);
+            GameManager.saveOverallTime($scope.game.totalTime, $scope.game.player);
           }
         // Game over
         } else {
           $scope.message = "Game over... You scored: " + $scope.game.totalScore + ". Click start to play again.";
           $scope.hideInput = false;
+          $scope.hideContinue = true;
+          GameManager.saveOverallScore($scope.game.totalScore, $scope.game.player);
+          GameManager.saveOverallTime($scope.game.totalTime, $scope.game.player);
         }
         $scope.game.level++;
         $scope.game.totalScore += $scope.game.levelScore;
