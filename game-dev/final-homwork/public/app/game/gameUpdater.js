@@ -74,6 +74,8 @@ angular.module('game')
         GameManager.saveLevelTime($scope.game.levelTime,
                                   $scope.game.level,
                                   $scope.game.player);
+        $scope.game.totalScore += $scope.game.levelScore;
+        $scope.game.totalTime += $scope.game.levelTime;
         $scope.game.status = false;
         // Check if any bombs exploded
         $scope.game.bombs.forEach(function (bomb, index) {
@@ -81,8 +83,6 @@ angular.module('game')
             $scope.game.continueToNextLevel = false;
           }
         });
-        $scope.game.totalTime += $scope.game.levelTime;
-        $scope.game.totalScore += $scope.game.levelScore;
         if ($scope.game.continueToNextLevel) {
           if ($scope.game.level !== 5) {
             $scope.message = "You completed level " + $scope.game.level + " with a score of " + $scope.game.levelScore;
@@ -91,6 +91,7 @@ angular.module('game')
             $scope.message = "You have completed the game with a score of " + $scope.game.totalScore + "! Click start to play again.";
             $scope.hideInput = false;
             $scope.hideContinue = true;
+            console.log('saved overall');
             GameManager.saveOverallScore($scope.game.totalScore, $scope.game.player);
             GameManager.saveOverallTime($scope.game.totalTime, $scope.game.player);
           }
@@ -99,14 +100,13 @@ angular.module('game')
           $scope.message = "Game over... You scored: " + $scope.game.totalScore + ". Click start to play again.";
           $scope.hideInput = false;
           $scope.hideContinue = true;
+          console.log('saved overall');
           GameManager.saveOverallScore($scope.game.totalScore, $scope.game.player);
           GameManager.saveOverallTime($scope.game.totalTime, $scope.game.player);
         }
-        $scope.game.level++;
-        $scope.game.totalScore += $scope.game.levelScore;
-        $scope.game.levelScore = 0;
-        $scope.game.totalTime += $scope.game.levelTime;
         $scope.game.levelTime = 0;
+        $scope.game.levelScore = 0;
+        $scope.game.level++;
         $scope.game.updateAngular = true;
       }
     }

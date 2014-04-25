@@ -1,7 +1,7 @@
 angular.module('game')
 
 .controller('homeCtrl', ['$scope', function($scope) {
-  $scope.title = 'Game';
+  $scope.title = 'Bomb Diffuser';
   $scope.display = true;
 
 }]);

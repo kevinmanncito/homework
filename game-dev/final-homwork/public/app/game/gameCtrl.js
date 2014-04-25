@@ -3,6 +3,7 @@ angular.module('game')
   .controller('gameCtrl', [
       '$scope', 
       '$location', 
+      '$timeout', 
       'Updater', 
       'Renderer', 
       'Particles', 
@@ -10,6 +11,7 @@ angular.module('game')
     function(
       $scope, 
       $location, 
+      $timeout, 
       Updater,
       Renderer,
       Particles,
@@ -46,23 +48,23 @@ angular.module('game')
       
       // Production
       $scope.message = 'Get ready!';
-      setTimeout(function () {
+      $timeout(function () {
         $scope.message = "3";
         $scope.$apply();
       }, 1000);
-      setTimeout(function () {
+      $timeout(function () {
         $scope.message = "2";
         $scope.$apply();
       }, 2000);
-      setTimeout(function () {
+      $timeout(function () {
         $scope.message = "1";
         $scope.$apply();
       }, 3000);
-      setTimeout(function () {
+      $timeout(function () {
         $scope.message = "Go!";
         $scope.$apply();
       }, 4000);
-      setTimeout(function () {
+      $timeout(function () {
         $scope.message = "Score: " + $scope.game.levelScore + " Level: " + $scope.game.level;
         $scope.game.status = true;
         $scope.game.secondTimer = 0;
@@ -84,11 +86,37 @@ angular.module('game')
         $scope.game.player = 'Guest';
       }
       $scope.hideInput = true;
-      $scope.message = "Score: " + $scope.game.levelScore + " Level: " + $scope.game.level;
+      $scope.hideContinue = true;
       
       // Development
-      requestAnimationFrame(gameLoop);
-      $scope.game.status = true;
+      // requestAnimationFrame(gameLoop);
+      // $scope.game.status = true;
+
+      // Production
+      $scope.message = 'Get ready!';
+      $timeout(function () {
+        $scope.message = "3";
+        $scope.$apply();
+      }, 1000);
+      $timeout(function () {
+        $scope.message = "2";
+        $scope.$apply();
+      }, 2000);
+      $timeout(function () {
+        $scope.message = "1";
+        $scope.$apply();
+      }, 3000);
+      $timeout(function () {
+        $scope.message = "Go!";
+        $scope.$apply();
+      }, 4000);
+      $timeout(function () {
+        $scope.message = "Score: " + $scope.game.levelScore + " Level: " + $scope.game.level;
+        $scope.game.status = true;
+        $scope.game.secondTimer = 0;
+        $scope.$apply();
+        requestAnimationFrame(gameLoop);
+      }, 5000);
     };
     
     $scope.diffuseBomb = function($event) {

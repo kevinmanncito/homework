@@ -332,7 +332,6 @@ angular.module('game')
         scores.push({score:score,
                      name:player});
       }
-      console.log(localStorage);
       localStorage['score'+String(level)] = JSON.stringify(scores);
     }
 
@@ -355,10 +354,10 @@ angular.module('game')
               scores[index].score = s.score;
             }
           }
-          if (!hasScore) {
-            scores.push({score:score, name:player});
-          }
         });
+        if (!hasScore) {
+          scores.push({score:score, name:player});
+        }
       } else {
         scores.push({name:player,
                      score:score});
@@ -388,7 +387,7 @@ angular.module('game')
         });
         if (!hasTime) {
           times.push({time:time,
-                       name:player});
+                      name:player});
         }
         
       } else { // First time a score for this level has been added
@@ -411,16 +410,16 @@ angular.module('game')
         times = JSON.parse(localStorage['overallTime']);
         hasTime = false;
         times.forEach(function (t, index) {
-          if (t.name === player) {
+          if (String(t.name) === String(player)) {
             hasTime = true;
             if (time > t.time) {
               times[index].time = t.time;
             }
           }
-          if (!hasTime) {
-            times.push({time:time, name:player});
-          }
         });
+        if (!hasTime) {
+          times.push({time:time, name:player});
+        }
       } else {
         times.push({name:player,
                     time:time});
